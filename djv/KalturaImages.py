@@ -33,6 +33,3 @@ def generateImages(entry_id):
         f.write(r2.content)
         f.close()
         i+=1
-
-
-generateImages('1_423rtyb6')
