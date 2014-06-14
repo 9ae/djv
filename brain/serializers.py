@@ -1,21 +1,29 @@
-from django.contrib.auth.models import User, Group
 from rest_framework import serializers
 
+from models import FbPhoto
+from models import FbUser
 from models import Media
+from models import Tag
 
 
-class UserSerializer(serializers.HyperlinkedModelSerializer):
+class FbPhotoSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = User
-        fields = ('url', 'username', 'email', 'groups')
+        model = FbPhoto
+        fields = ('id', 'url',)
 
-
-class GroupSerializer(serializers.HyperlinkedModelSerializer):
+class FbUserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = Group
-        fields = ('url', 'name')
+        model = FbUser
+        fields = ('id', 'name', 'email',)
 
 class MediaSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Media
         fields = ('id',)
+
+class TagSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Tag
+        fields = ('name', 'category',)
+
+

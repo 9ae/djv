@@ -2,6 +2,17 @@ from django.contrib.auth.models import User
 from django.db import models
 
 
+class FbPhoto(models.Model):
+    id = models.IntegerField(primary_key=True)
+    url = models.URLField()
+
+
+class FbUser(models.Model):
+    id = models.IntegerField(primary_key=True)
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+
+
 class Tag(models.Model):
     CATEGORY = (
         ('COLOR', 'Color',),
@@ -24,5 +35,5 @@ class Media(models.Model):
     # see http://www.kaltura.com/api_v3/testmeDoc/index.php?object=KalturaBaseEntry
     id = models.CharField(max_length=100, primary_key=True)
 
-    user = models.ForeignKey(User)
+#    user = models.ForeignKey(User)
     tags = models.ManyToManyField(Tag)

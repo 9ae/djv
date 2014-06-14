@@ -1,1 +1,5 @@
-.ropeproject.venv*.pyc.*.sw*
+.ropeproject
+.venv
+*.pyc
+*.sw*
+db.sqlite3
