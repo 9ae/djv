@@ -1,1 +1,1 @@
-*.pyc
+.ropeproject.venv*.pyc.*.sw*

@@ -1,20 +1,28 @@
 from django.conf.urls import patterns, include, url
+from rest_framework import routers
+from rest_framework.urlpatterns import format_suffix_patterns
+from brain import views
 
-# Uncomment the next two lines to enable the admin:
-# from django.contrib import admin
-# admin.autodiscover()
+from django.contrib import admin
+admin.autodiscover()
 
-urlpatterns = patterns('',
+# Routers provide an easy way of automatically determining the URL conf.
+router = routers.DefaultRouter()
+router.register(r'users', views.UserViewSet)
+router.register(r'groups', views.GroupViewSet)
+
+urlpatterns = format_suffix_patterns(patterns('brain.views',
+    url(r'^$', 'api_root'),
+    url(r'^media/$', views.MediaList.as_view(), name='media-list'),
+))
+
+urlpatterns += patterns('',
     # Examples:
-     url(r'^user/(?P<user>[0-9]+)/upload_video$', 'brain.views.upload_video'),
-     url(r'^user/(?P<user>\d+)/sync$', 'brain.views.sync'),
-     url(r'^user/(?P<user>\d+)/get_tags/(?P<video>\d+)$', 'brain.views.get_tags'),
-     url(r'^user/(?P<user>\d+)/get_video/(?P<video>\d+)$', 'brain.views.get_video'),
-    # url(r'^djv/', include('djv.foo.urls')),
+    # url(r'^$', 'djv.views.home', name='home'),
+    # url(r'^blog/', include('blog.urls')),
 
-    # Uncomment the admin/doc line below to enable admin documentation:
-    # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
+    url(r'^admin/', include(admin.site.urls)),
+    url(r'^api-auth/', include('djv.urls', namespace='rest_framework')),
 
-    # Uncomment the next line to enable the admin:
-    # url(r'^admin/', include(admin.site.urls)),
+    url(r'^', include(router.urls)),
 )
