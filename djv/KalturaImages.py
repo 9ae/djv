@@ -22,9 +22,10 @@ def generateImages(entry_id):
     secs = data['duration']
 
     i = 0
-    while i <= secs:
+    until = secs/3
+    while i <= until:
         imageAtSecond(entry_id, i)
-        i+=2
+        i+=1
 
 
 def imageAtSecond(entry_id, s):
@@ -34,4 +35,4 @@ def imageAtSecond(entry_id, s):
     f.write(r.content)
     f.close()
 
-generateImages('1_ziiv6fa7')
+generateImages('1_423rtyb6')
