@@ -1,21 +1,26 @@
 import requests
 from KalturaClient import *
 from KalturaClient.Plugins.Metadata import *
+
 from api_secrets import *
+
 
 API_BASE_URL = 'http://www.kaltura.com/api_v3/index.php?'
 PUBLIC_BASE_URL = 'http://www.kaltura.com/p/'+str(PARTNER_ID)
 
-def GetConfig():
+def GetClient():
     config = KalturaConfiguration(PARTNER_ID)
     config.serviceUrl = SERVICE_URL
-    return config
+    return KalturaClient(config)
+
+def GetKS():
+    config = KalturaConfiguration(PARTNER_ID)
+    config.serviceUrl = SERVICE_URL
+    client = KalturaClient(config)
+    return client.generateSession(ADMIN_SECRET, USER_NAME, KalturaSessionType.ADMIN, PARTNER_ID, 86400, "")
 
 def generateImages(entry_id):
-    client = KalturaClient(GetConfig())
-
-    # start new session (client session is enough when we do operations in a users scope)
-    ks = client.generateSession(ADMIN_SECRET, USER_NAME, KalturaSessionType.ADMIN, PARTNER_ID, 86400, "")
+    ks = GetKS()
 
     r = requests.get(API_BASE_URL+'service=media&action=get&format=1&entryId='+entry_id+'&ks='+ks)
     data = r.json()
@@ -33,3 +38,5 @@ def generateImages(entry_id):
         f.write(r2.content)
         f.close()
         i+=1
+
+    # close session
