@@ -1,7 +1,13 @@
 import datetime
+import logging
 import os
 import json
 
+import kaltura
+import voicebase
+
+FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+logging.basicConfig(format=FORMAT, level=logging.INFO)
 
 def get_api_secrets():
     with open(os.path.join(os.path.dirname(__file__), 'secret.json')) as f:
