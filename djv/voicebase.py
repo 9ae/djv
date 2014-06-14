@@ -14,13 +14,14 @@ API_URL = 'https://www.VoiceBase.com/services?version=1.0'
 
 def post_entry(entry_id):
     """Post a Kaltura entry to VoiceBase for transcription"""
-    entry_url = kaltura.get_entry_download_url('1_ziiv6fa7')
+    entry_url = kaltura.get_entry_download_url(entry_id)
     params = {
         'apikey': VOICEBASE_APIKEY,
         'password': VOICEBASE_PASSWD,
         'action': 'uploadMediaGet',
         'mediaURL': entry_url,
         'transcriptType': 'machine',
+        'title': entry_id,
         'externalid': entry_id,
     }
     r = requests.get(API_URL, params=params)
@@ -37,7 +38,7 @@ def get_script(entry_id):
         'password': VOICEBASE_PASSWD,
         'action': 'getTranscript',
         'externalID': entry_id,
-        'format': 'txt',
+        'confidence': 0.75,
     }
     r = requests.post(API_URL, data=params)
     logger.info('VoiceBase returned for getting entry %s: %s' % (
@@ -45,9 +46,29 @@ def get_script(entry_id):
     data = r.json()
     return data.get('transcript', None)
 
+def get_keywords(entry_id):
+    """Return a list of keywords of a Kaltura entry
+
+    Note that we are using the GetFileAnalytics API, which gives the real
+    keywords. The GetKeywords/GetSEOKeywords API simply returns the transcript.
+    """
+    params = {
+        'apikey': VOICEBASE_APIKEY,
+        'password': VOICEBASE_PASSWD,
+        'action': 'getFileAnalytics',
+        'externalID': entry_id,
+        'format': 'txt',
+    }
+    r = requests.post(API_URL, data=params)
+    logger.info('VoiceBase returned for getting entry %s: %s' % (
+            entry_id, r.content))
+    data = r.json()
+    return [kw['name'] for kw in data.get('keywords', [])]
+
 if __name__ == '__main__':
-    post_entry('1_qq6kbapa')
-    print get_script('1_qq6kbapa')
+    entry_id = '1_d0f7fdqq'
+    #post_entry(entry_id)
+    print get_keywords(entry_id)
 
 '''
 # Upload stuff
@@ -69,4 +90,22 @@ r = requests.post(
         },
     )
 print r, r.content
+
+def get_SEO_keywords(entry_id):
+    """Return the SEO keywords for a Kaltura entry
+
+    Return None if transcript is not available.
+    """
+    params = {
+        'apikey': VOICEBASE_APIKEY,
+        'password': VOICEBASE_PASSWD,
+        'action': 'getSEOKeywords',
+        'externalID': entry_id,
+        'format': 'txt',
+    }
+    r = requests.post(API_URL, data=params)
+    logger.info('VoiceBase returned for getting entry %s: %s' % (
+            entry_id, r.content))
+    data = r.json()
+    return data.get('transcript', None)
 '''
