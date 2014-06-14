@@ -30,7 +30,7 @@ def generateImages(entry_id):
 def imageAtSecond(entry_id, s):
     r = requests.get(PUBLIC_BASE_URL+'/thumbnail/entry_id/'+entry_id+'/quality/100/vid_sec/'+str(s))
     print r.headers
-    f = open('../static/'+entry_id+'-'+str(s)+'.jpg','wb')
+    f = open('../static/images/'+entry_id+'-'+str(s)+'.jpg','wb')
     f.write(r.content)
     f.close()
 
