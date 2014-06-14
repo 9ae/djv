@@ -22,7 +22,7 @@ def recon_scene(url):
     return response['scene_understanding']['matches']
 
 
-def tag_tmages(entry_id):
+def tag_images(entry_id):
     os.chdir(IMAGES_DIR)
     files_list = glob.glob(entry_id+'-*.jpg')
 
