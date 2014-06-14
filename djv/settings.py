@@ -12,12 +12,13 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
+from djv import get_api_secrets
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '^%)$7%4p6e!30u(1)i5h#=gdz#azjv&r+2=2deipj%xywx@y(s'
+SECRET_KEY = get_api_secrets()['djv']['secret_key']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -38,6 +39,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
 
     'brain',
+    'oauth',
     'rest_framework',
 )
 
@@ -102,3 +104,6 @@ REST_FRAMEWORK = {
 
     'PAGINATE_BY': 10,
 }
+
+FACEBOOK_APP_ID = '640208246064856'
+FACEBOOK_APP_SECRET = '4ae40ff382e49fe75e550d45f6ec1443'

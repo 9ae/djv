@@ -1,55 +1,21 @@
-import uuid
+import json
+import urllib
 
-from django.contrib.auth.models import User, Group
 from rest_framework import status
-from rest_framework import viewsets
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 
-from models import Media
-from serializers import UserSerializer, GroupSerializer, MediaSerializer
-
-#def upload_video(request,user=1):
-#	return HttpResponse("your video id is 1")
-#
-#def sync(request,user=1):
-#	#check user has all the tags they neeed for the video
-#	return HttpResponse("here are your new tags and videos")
-#
-#def get_tags(request,user=1,video=1):
-#	# get tags for given video id
-#	return HttpResponse("tags list for "+video)
-#
-#def get_video(request,user=1,video=1):
-#	# get url to download video for kaltura and its tag as well
-#	return HttpResponse("http://...kalura.com/safsdfawe/...")
-
-
-
-
-class UserViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows users to be viewed or edited.
-    """
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-
-
-class GroupViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows groups to be viewed or edited.
-    """
-    queryset = Group.objects.all()
-    serializer_class = GroupSerializer
+from models import FbUser, Media
+from serializers import FbUserSerializer
+from serializers import MediaSerializer
 
 
 class MediaList(APIView):
     """
     List all media, or upload a new media.
     """
-    model = Media
 
     def get(self, request, format=None):
         medias = Media.objects.all()
@@ -59,16 +25,50 @@ class MediaList(APIView):
     def post(self, request, format=None):
         # TODO: begin process of accessing external APIs and tagging
         # currently only creates a dummy media object
-        media = Media(id=str(uuid.uuid4()),
-                      user=request.user)
-        serializer = MediaSerializer(media)
+        import pdb; pdb.set_trace()  # XXX BREAKPOINT
+
+        serializer = MediaSerializer(data=request.DATA)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+class FbProfileDetail(APIView):
+    """
+    Retrieve Facebook user details.
+    """
+    def get(self, request, format=None):
+        access_token = request.GET.get('access_token', '')
+        profile = json.load(urllib.urlopen('https://graph.facebook.com/me?%s' % urllib.urlencode(dict(access_token=access_token))))
+        fb_user = FbUser(id=profile['id'],
+                         name=profile['name'],
+                         email=profile['email'])
+
+        serializer = FbUserSerializer(fb_user)
+        return Response(serializer.data)
+
+
+class FbFriendList(APIView):
+    """
+    List all Facebook current user friends.
+    """
+
+    def get(self, request, format=None):
+        access_token = request.GET.get('access_token', '')
+        friends = json.load(urllib.urlopen('https://graph.facebook.com/me/friends?%s' % urllib.urlencode(dict(access_token=access_token))))
+        import pdb; pdb.set_trace()  # XXX BREAKPOINT
+
+        serializer = FbUserSerializer([], many=True)
+        return Response(serializer.data)
+
+
+
+
 @api_view(('GET',))
 def api_root(request, format=None):
     return Response({
-        'medias': reverse('media-list', request=request, format=format)
+        'medias': reverse('media-list', request=request, format=format),
+        'fb_friends': reverse('fb-friends-list', request=request, format=format),
+        'fb_profile_detail': reverse('fb-profile-detail', request=request, format=format),
     })

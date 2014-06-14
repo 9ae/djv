@@ -28,7 +28,10 @@ def get_entry_metadata(entry_id):
 
 def get_entry_download_url(entry_id):
     data = get_entry_metadata(entry_id)
-    return data['downloadUrl']
+    url = data['downloadUrl']
+    logger.info('Found Download URL for entry %s: %s' % (entry_id, url))
+    return url
 
 if __name__ == '__main__':
-    print get_entry_download_url('1_ziiv6fa7')
+    pass
+    #print get_entry_download_url('1_ziiv6fa7')
