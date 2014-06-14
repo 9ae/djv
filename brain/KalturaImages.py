@@ -27,7 +27,6 @@ def generateImages(entry_id):
     secs = data['duration']
     w = data['width']
     h = data['height']
-
     i = 0
     until = secs/3
     while i <= until:
@@ -38,5 +37,3 @@ def generateImages(entry_id):
         f.write(r2.content)
         f.close()
         i+=1
-
-    # close session
