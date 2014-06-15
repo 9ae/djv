@@ -6,6 +6,8 @@ from api_secrets import *
 import os
 import os.path
 
+from djv import settings
+
 HERE = os.path.abspath(os.path.dirname(__file__))
 API_BASE_URL = 'http://www.kaltura.com/api_v3/index.php?'
 PUBLIC_BASE_URL = 'http://www.kaltura.com/p/'+str(PARTNER_ID)
@@ -32,9 +34,13 @@ def get_image(entry_id,i):
 
 def generate_images(entry_id):
     ks = GetKS()
-    os.chdir('static/images/')
+    os.chdir(os.path.join(settings.MEDIA_ROOT, 'static/images/'))
+
     r = requests.get(API_BASE_URL+'service=media&action=get&format=1&entryId='+entry_id+'&ks='+ks)
     data = r.json()
+
+    if 'duration' not in data:
+        raise Exception(data)
 
     secs = data['duration']
 

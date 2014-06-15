@@ -5,14 +5,16 @@ from api_secrets import *
 from KalturaUpload import update_tags
 from recognition import recognise_unknown_photo, get_fb_user
 
+from djv import settings
+
 BASE_URL = 'http://rekognition.com/func/api/'
 STOCKPODIUM_URL = 'http://labs.stockpodium.com/adapi/tagging.php?'
 
-IMAGES_DIR = 'static/images/'
-IMAGES_BASE_URL = 'http://104.130.3.99/static/images/'
+IMAGES_DIR = os.path.join(settings.MEDIA_ROOT, 'static/images/')
+IMAGES_BASE_URL = 'http://104.130.3.99/media/static/images/'
 
 SCENE_THRESHOLD = 0.05
-OBJECT_THRESHOLD = 5.0
+OBJECT_THRESHOLD = 30.0
 
 def recon_scene(url):
     params = {'api_key':REK_KEY,
