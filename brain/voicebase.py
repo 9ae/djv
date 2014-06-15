@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 API_URL = 'https://www.VoiceBase.com/services?version=1.0'
 
-def post_entry(entry_id, transcription_type='machine'):
+def post_entry(entry_id, transcription_type='human'):
     """Post a Kaltura entry to VoiceBase for transcription
 
     Transcription type can be either human or machine.
