@@ -3,6 +3,7 @@ import os
 import requests
 from api_secrets import *
 from KalturaUpload import update_tags
+from recognistion import recognise_unknown_photo, get_fb_user
 
 BASE_URL = 'http://rekognition.com/func/api/'
 STOCKPODIUM_URL = 'http://labs.stockpodium.com/adapi/tagging.php?'
@@ -51,5 +52,18 @@ def tag_images_stock(entry_id):
         for tag in scene_tags:
             if tag['confidence']>OBJECT_THRESHOLD and not(tag['tag'] in tags):
                 tags.append(tag['tag'])
+
+    update_tags(entry_id,tags)
+
+def tag_people(entry_id,access_token):
+    os.chdir(IMAGES_DIR)
+    files_list = glob.glob(entry_id+'-*.jpg')
+
+    tags = []
+
+    for filename in files_list:
+        candidate = recognise_unknown_photo(get_fb_user(access_token).id, IMAGES_BASE_URL+filename)
+        if not(candidate in tags):
+            tags.append(candidate)
 
     update_tags(entry_id,tags)
