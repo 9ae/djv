@@ -14,7 +14,7 @@ API_URL = 'https://www.VoiceBase.com/services?version=1.0'
 
 def post_entry(entry_id):
     """Post a Kaltura entry to VoiceBase for transcription"""
-    entry_url = kaltura.get_entry_download_url(entry_id)
+    entry_url = kaltura.get_entry_download_url_with_flavor(entry_id)
     params = {
         'apikey': VOICEBASE_APIKEY,
         'password': VOICEBASE_PASSWD,
@@ -28,7 +28,7 @@ def post_entry(entry_id):
     logger.info('VoiceBase returned for posting entry %s: %s' % (
             entry_id, r.content))
 
-def get_script(entry_id):
+def get_transcript(entry_id):
     """Return the transcript for a Kaltura entry
 
     Return None if transcript is not available.
@@ -66,9 +66,15 @@ def get_keywords(entry_id):
     return [kw['name'] for kw in data.get('keywords', [])]
 
 if __name__ == '__main__':
-    entry_id = '1_d0f7fdqq'
-    #post_entry(entry_id)
-    print get_keywords(entry_id)
+    entry_ids = [
+        '1_p5vwu17n',  # Birdman
+        '1_84cxv1si',  # Evolution of Dad
+        '1_8ycl7639',  # foodnsport
+    ]
+    for entry_id in entry_ids:
+        post_entry(entry_id)
+        print get_transcript(entry_id)
+        print get_keywords(entry_id)
 
 '''
 # Upload stuff
