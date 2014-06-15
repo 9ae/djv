@@ -31,3 +31,8 @@ class ThinkThread(Thread):
 
     def run(self):
         generate_images(self.entry_id)
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+            object_future = executor.submit(tag_images_stock, self.entry_id)
+            # human_future =
+
