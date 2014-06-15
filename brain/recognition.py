@@ -12,7 +12,7 @@ import urlparse
 from PIL import Image
 
 
-def print_result(hint, result):
+def log_result(hint, result):
     def encode(obj):
         if type(obj) is unicode:
             return obj.encode('utf-8')
@@ -54,6 +54,8 @@ def get_fb_photos(access_token, user_id='me', limit=200):
 def process_fb_photo(fb_photo_obj, access_token, user_id='me'):
     from djv import settings
 
+    fb_photo_tags = []
+
     fb_user = get_fb_user(access_token)
     if user_id == 'me':
         user_id = fb_user.id
@@ -88,7 +90,6 @@ def process_fb_photo(fb_photo_obj, access_token, user_id='me'):
             else:
                 y_tolerance *= (float(width) / float(height))
 
-        fb_photo_tags = []
         for t in tags:
             source_image = Image.open(source_filename)
             tag_id = t['id']
@@ -117,19 +118,20 @@ def process_fb_photo(fb_photo_obj, access_token, user_id='me'):
             fb_photo_tags.append(dict(id=tag_id,
                                       name=t['name'],
                                       image=os.path.basename(cropped_filename)))
-
-        return fb_photo_tags
-
+    except Exception, e:
+        logging.error(str(e))
     finally:
         os.close(source_fd)
         os.unlink(source_filename)
 
+    return fb_photo_tags
+
 def filter_fb_photos_for_training(fb_photo_tags, min_sample_size=20):
     name_counts = Counter([t['name'] for t in fb_photo_tags])
     name_counts = sorted(name_counts.items(), cmp=lambda x, y: cmp(x[1], y[1]), reverse=True)
-    name_counts = filter(lambda x: x[1] >= min_sample_size, name_counts)
+    names = map(lambda x: x[0], filter(lambda x: x[1] >= min_sample_size, name_counts))
 
-    return name_counts
+    return filter(lambda x: x['name'] in names, fb_photo_tags)
 
 
 #    fb_user = FbUser.objects.get(id=user_id)
@@ -158,7 +160,7 @@ def upload_fb_photos_for_training(photos, group_name, media_uri):
         # upload images for associated names to recognise face
         url = urlparse.urljoin(media_uri, p['image'])
         result = api.detection.detect(url=url, mode='oneface')
-        print_result('Detection result for {}:'.format(p['name']), result)
+        log_result('Detection result for {}:'.format(p['name']), result)
 
         # create person with associated face
         if len(result['face']) > 0:
@@ -177,14 +179,14 @@ def train_fb_photos(group_name):
 
     # train the group with faces
     result = api.recognition.train(group_name=group_name, type='all')
-    print_result('Train result:', result)
+    log_result('Train result:', result)
 
     session_id = result['session_id']
     sleep_duration = 1
     while True:
         result = api.info.get_session(session_id=session_id)
         if result['status'] == u'SUCC':
-            print_result('Async train result:', result)
+            log_result('Async train result:', result)
             break
         time.sleep(sleep_duration)
         sleep_duration = min(sleep_duration * 2, 60)
@@ -192,11 +194,25 @@ def train_fb_photos(group_name):
 def recognise_unknown_photo(group_name, url):
     api = get_facepp_api()
     result = api.recognition.recognize(url=url, group_name=group_name)
-    print_result('Recognize result:', result)
+    log_result('Recognize Result:', result)
     print '=' * 60
     print 'The person with highest confidence:', result['face'][0]['candidate'][0]['person_name']
     return result['face'][0]['candidate'][0]['person_name']
 
+
+def clean_training_state(fb_photo_tags=[], group_name=None):
+    from djv import settings
+    api = get_facepp_api()
+
+    if group_name is not None:
+        try:
+            api.group.delete(group_name=group_name)
+        except APIError, e:
+            logging.error(str(e))
+
+    for p in fb_photo_tags:
+        f = os.path.join(settings.MEDIA_ROOT, p['image'])
+        os.unlink(f)
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)

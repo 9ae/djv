@@ -60,20 +60,22 @@ class FbProfileDetail(APIView):
 
     def post(self, request, format=None):
         access_token = str(request.DATA.get('access_token', ''))
+        force_initialise = bool(request.DATA.get('force_initialise', False))
+
         args = urllib.urlencode(dict(access_token=access_token))
         url = 'https://graph.facebook.com/me?%(args)s' % locals()
         profile = json.load(urllib.urlopen(url))
         fb_user, created = FbUser.objects.get_or_create(id=profile['id'],
                                                         name = profile['name'])
-        if created or not fb_user.is_initialised:
+        if force_initialise or created or not fb_user.is_initialised:
             initialise_fb_user('http://%s' % request.get_host(), access_token)
             fb_user.is_initialised = True
             fb_user.save()
 
-        serializer = FbUserSerializer(fb_user)
+        serializer = FbUserSerializer(fb_user, data=request.DATA, partial=True)
         if serializer.is_valid():
-            serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
