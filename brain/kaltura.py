@@ -1,5 +1,7 @@
 """Kaltura API wrapper"""
 
+__author__ = 'henry'
+
 import logging
 import requests
 
