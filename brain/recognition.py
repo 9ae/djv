@@ -1,3 +1,4 @@
+from collections import Counter
 import logging
 import json
 import os
@@ -8,7 +9,6 @@ import sys
 import time
 import urlparse
 
-from django.core.files import File
 from PIL import Image
 
 
@@ -50,9 +50,9 @@ def get_fb_photos(access_token, user_id='me', limit=200):
                                  limit=limit))
     return json.load(urllib.urlopen('https://graph.facebook.com/%(user_id)s/photos?%(args)s' % locals()))
 
+
 def process_fb_photo(fb_photo_obj, access_token, user_id='me'):
-    from brain.models import FbPhoto
-    from brain.models import FbPhotoTag
+    from djv import settings
 
     fb_user = get_fb_user(access_token)
     if user_id == 'me':
@@ -69,13 +69,6 @@ def process_fb_photo(fb_photo_obj, access_token, user_id='me'):
 
         height = fb_photo_obj['height']
         width = fb_photo_obj['width']
-
-        # save main photo
-        fb_photo = None
-#        fb_photo, _ = FbPhoto.objects.get_or_create(id=photo_id)
-#        fb_photo.name = photo_name
-#        fb_photo.url = fb_photo_obj['source']
-#        fb_photo.save()
 
         tags = filter(lambda x: 'id' in x, fb_photo_obj['tags']['data'])
         height = fb_photo_obj['height']
@@ -115,40 +108,36 @@ def process_fb_photo(fb_photo_obj, access_token, user_id='me'):
 
             # crop image
             cropped_image = source_image.crop(box)
-            cropped_filename = os.path.join(tempfile.tempdir, '%(tag_id)s.jpg' % locals())
-            try:
-                # save cropped image to temporary file
-                cropped_image.save(cropped_filename)
+            cropped_filename = os.path.join(settings.MEDIA_ROOT, '%(tag_id)s.jpg' % locals())
 
-                # save cropped image to database
-                with open(cropped_filename) as f:
-                    fb_photo_tag, _ = FbPhotoTag.objects.get_or_create(id=tag_id, requestor=fb_user)
-                    fb_photo_tag.name = t['name']
-                    fb_photo_tag.image = File(f)
-                    fb_photo_tag.save()
-                    fb_photo_tags.append(fb_photo_tag)
-            finally:
-                os.unlink(cropped_filename)
+            # save cropped image to media location
+            cropped_image.save(cropped_filename)
 
-        return fb_photo, fb_photo_tags
+            # save cropped image to database
+            fb_photo_tags.append(dict(id=tag_id,
+                                      name=t['name'],
+                                      image=os.path.basename(cropped_filename)))
+
+        return fb_photo_tags
 
     finally:
         os.close(source_fd)
         os.unlink(source_filename)
 
-def filter_fb_photos_for_training(user_id, sample_size=20, limit=5):
-    from django.db.models import Count
+def filter_fb_photos_for_training(fb_photo_tags, min_sample_size=20):
+    name_counts = Counter([t['name'] for t in fb_photo_tags])
+    name_counts = sorted(name_counts.items(), cmp=lambda x, y: cmp(x[1], y[1]), reverse=True)
+    name_counts = filter(lambda x: x[1] >= min_sample_size, name_counts)
 
-    from brain.models import FbPhotoTag
-    from brain.models import FbUser
+    return name_counts
 
 
-    fb_user = FbUser.objects.get(id=user_id)
-
-    tags = FbPhotoTag.objects.values('name').annotate(count=Count('name')).\
-        filter(count__gte=sample_size, requestor=fb_user).order_by('-count')
-    return [pt for t in tags[:limit] for pt in FbPhotoTag.objects.filter(requestor=fb_user, name=t['name'])] \
-        if tags.count() != 0 else []
+#    fb_user = FbUser.objects.get(id=user_id)
+#
+#    tags = FbPhotoTag.objects.values('name').annotate(count=Count('name')).\
+#        filter(count__gte=sample_size, requestor=fb_user).order_by('-count')
+#    return [pt for t in tags[:limit] for pt in FbPhotoTag.objects.filter(requestor=fb_user, name=t['name'])] \
+#        if tags.count() != 0 else []
 
 
 def upload_fb_photos_for_training(photos, group_name, media_uri):
@@ -164,23 +153,23 @@ def upload_fb_photos_for_training(photos, group_name, media_uri):
             raise
 
     for p in photos:
-        logging.info('Uploading file for training: "%s"' % os.path.basename(p.image.url))
+        logging.info('Uploading file for training: "%s"' % os.path.basename(p['image']))
 
         # upload images for associated names to recognise face
-        url = urlparse.urljoin(media_uri, p.image.url)
+        url = urlparse.urljoin(media_uri, p['image'])
         result = api.detection.detect(url=url, mode='oneface')
-        print_result('Detection result for {}:'.format(p.name), result)
+        print_result('Detection result for {}:'.format(p['name']), result)
 
         # create person with associated face
         if len(result['face']) > 0:
             face_id = result['face'][0]['face_id']
             try:
-                api.person.create(person_name=p.name, group_name=group_name, face_id=face_id)
+                api.person.create(person_name=p['name'], group_name=group_name, face_id=face_id)
             except APIError, e:
                 if e.code not in (453,):
                     raise
                 else:
-                    api.person.add_face(person_name=p.name, face_id=face_id)
+                    api.person.add_face(person_name=p['name'], face_id=face_id)
 
 
 def train_fb_photos(group_name):
@@ -205,10 +194,8 @@ def recognise_unknown_photo(group_name, url):
     result = api.recognition.recognize(url=url, group_name=group_name)
     print_result('Recognize result:', result)
     print '=' * 60
-    print 'The person with highest confidence:', \
-                    result['face'][0]['candidate'][0]['person_name']
+    print 'The person with highest confidence:', result['face'][0]['candidate'][0]['person_name']
     return result['face'][0]['candidate'][0]['person_name']
-
 
 
 if __name__ == '__main__':
