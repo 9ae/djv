@@ -8,7 +8,7 @@ BASE_URL = 'http://rekognition.com/func/api/'
 STOCKPODIUM_URL = 'http://labs.stockpodium.com/adapi/tagging.php?'
 
 IMAGES_DIR = '../static/images/'
-IMAGES_BASE_URL = 'http://104.130.3.99/images/'
+IMAGES_BASE_URL = 'http://104.130.3.99:8000/static/images/'
 
 SCENE_THRESHOLD = 0.05
 OBJECT_THRESHOLD = 5.0
