@@ -207,6 +207,7 @@ def recognise_unknown_photo(group_name, url):
     print '=' * 60
     print 'The person with highest confidence:', \
                     result['face'][0]['candidate'][0]['person_name']
+    return result['face'][0]['candidate'][0]['person_name']
 
 
 

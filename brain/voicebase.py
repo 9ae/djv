@@ -1,5 +1,7 @@
 """Interface to the VoiceBase API"""
-from brain import kaltura
+import kaltura
+from api_secrets import *
+from KalturaUpload import update_tags
 
 __author__ = 'henry'
 
@@ -71,8 +73,8 @@ if __name__ == '__main__':
     ]
     for entry_id in entry_ids:
         post_entry(entry_id)
-        print get_transcript(entry_id)
-        print get_keywords(entry_id)
+        tags = get_keywords(entry_id)
+        update_tags(entry_id,tags)
 
 '''
 # Upload stuff

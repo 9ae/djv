@@ -4,5 +4,6 @@
 *.sw*
 db.sqlite3
 djv/secret.json
-static
+logs
 media
+static

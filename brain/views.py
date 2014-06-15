@@ -12,6 +12,7 @@ from serializers import FbUserSerializer
 from serializers import MediaSerializer
 from tasks import initialise_fb_user
 
+from ThinkThread import ThinkThread
 
 class MediaList(APIView):
     """
@@ -26,11 +27,15 @@ class MediaList(APIView):
     def post(self, request, format=None):
         # TODO: begin process of accessing external APIs and tagging
         # currently only creates a dummy media object
-        import pdb; pdb.set_trace()  # XXX BREAKPOINT
+        entry_id = request.POST.get('id')
+        access_token = request.POST.get('access_token')
 
         serializer = MediaSerializer(data=request.DATA)
         if serializer.is_valid():
             serializer.save()
+
+            main_thread = ThinkThread(entry_id,access_token)
+            main_thread.start()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
