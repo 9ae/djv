@@ -1,32 +1,35 @@
 """Interface to the VoiceBase API"""
-import kaltura
-from api_secrets import *
-from KalturaUpload import update_tags
 
 __author__ = 'henry'
 
 import logging
 import requests
+import kaltura
+
+from api_secrets import *
+from KalturaUpload import update_tags
 
 logger = logging.getLogger(__name__)
 
 API_URL = 'https://www.VoiceBase.com/services?version=1.0'
 
-def post_entry(entry_id):
-    """Post a Kaltura entry to VoiceBase for transcription"""
+def post_entry(entry_id, transcription_type='machine'):
+    """Post a Kaltura entry to VoiceBase for transcription
+
+    Transcription type can be either human or machine.
+    """
     entry_url = kaltura.get_entry_download_url_with_flavor(entry_id)
     params = {
         'apikey': VOICEBASE_APIKEY,
         'password': VOICEBASE_PASSWD,
         'action': 'uploadMediaGet',
         'mediaURL': entry_url,
-        'transcriptType': 'machine',
+        'transcriptType': transcription_type,
         'title': entry_id,
         'externalid': entry_id,
     }
     r = requests.get(API_URL, params=params)
-    logger.info('VoiceBase returned for posting entry %s: %s' % (
-            entry_id, r.content))
+    print 'VoiceBase returned: %s' % r.content
 
 def get_transcript(entry_id):
     """Return the transcript for a Kaltura entry
