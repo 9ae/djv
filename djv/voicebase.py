@@ -72,7 +72,7 @@ if __name__ == '__main__':
         '1_8ycl7639',  # foodnsport
     ]
     for entry_id in entry_ids:
-        post_entry(entry_id)
+        #post_entry(entry_id)
         print get_transcript(entry_id)
         print get_keywords(entry_id)
 
