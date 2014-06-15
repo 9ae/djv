@@ -1,14 +1,30 @@
 import logging
 import json
 import os
+from pprint import pformat
 import tempfile
 import urllib
 import sys
+import time
+import urlparse
 
 from django.core.files import File
 from PIL import Image
 import unirest
 
+
+def print_result(hint, result):
+    def encode(obj):
+        if type(obj) is unicode:
+            return obj.encode('utf-8')
+        if type(obj) is dict:
+            return {encode(k): encode(v) for (k, v) in obj.iteritems()}
+        if type(obj) is list:
+            return [encode(i) for i in obj]
+        return obj
+    print hint
+    result = encode(result)
+    print '\n'.join(['  ' + i for i in pformat(result, width = 75).split('\n')])
 
 def get_fb_user(access_token):
     from brain.models import FbUser
@@ -113,18 +129,31 @@ def process_fb_photo(fb_photo_obj, access_token, user_id='me'):
         os.close(source_fd)
         os.unlink(source_filename)
 
-def train_fb_photos(user_id, sample_size=20, limit=5):
+def get_facepp_api():
+    from facepp import API
+    from djv import get_api_secrets
+
+    return API(get_api_secrets()['facepp']['key'],
+               get_api_secrets()['facepp']['secret'])
+
+def train_fb_photos(user_id, media_url, sample_size=20, limit=5):
     from django.db.models import Count
+    from facepp import APIError
+
     from brain.models import FbPhotoTag
     from brain.models import FbUser
-    from djv import get_api_secrets
     from djv import settings
 
-    from facepp import API
 
     fb_user = FbUser.objects.get(id=user_id)
-    api = API(get_api_secrets()['facepp']['key'],
-              get_api_secrets()['facepp']['secret'])
+    api = get_facepp_api()
+
+    # create group for training
+    try:
+        api.group.create(group_name=user_id)
+    except APIError, e:
+        if e.code not in (453,):
+            raise
 
     tags = FbPhotoTag.objects.values('name').annotate(count=Count('name')).\
         filter(count__gte=sample_size, requestor=fb_user).order_by('-count')
@@ -132,21 +161,48 @@ def train_fb_photos(user_id, sample_size=20, limit=5):
         # adding tagged photo to album for training
         for t in tags[:5]:
             logging.info('Processing photos for Facebook user: "%(name)s"' % t)
+            import pdb; pdb.set_trace()
             for t in FbPhotoTag.objects.filter(requestor=fb_user, name=t['name']):
                 logging.info('Uploading file for training: "%s"' % os.path.basename(t.image.url))
-                with open(os.path.join(settings.MEDIA_ROOT, t.image.url)) as f:
-                    response = unirest.post('https://lambda-face-recognition.p.mashape.com/album_train',
-                                            headers={'X-Mashape-Authorization': key},
-                                            params={
-                                                'album': album_name,
-                                                'albumkey': album_key,
-                                                'entryid': t.name,
-                                                'files': f,
-                                            })
-                    logging.info('Lambda response: "%s"' % response.body)
 
+                # upload images for associated names to recognise face
+                url = urlparse.urljoin(media_url, t.image.url)
+                result = api.detection.detect(url=url, mode='oneface')
+                print_result('Detection result for {}:'.format(t.name), result)
 
+                # create person with associated face
+                if len(result['face']) > 0:
+                    face_id = result['face'][0]['face_id']
+                    try:
+                        api.person.create(person_name=t.name, group_name=user_id, face_id=face_id)
+                    except APIError, e:
+                        if e.code not in (453,):
+                            raise
+                        else:
+                            api.person.add_face(person_name=t.name, face_id=face_id)
 
+        # train the group with faces
+        import pdb; pdb.set_trace()
+        result = api.recognition.train(group_name=user_id, type='all')
+        print_result('Train result:', result)
+
+        session_id = result['session_id']
+        sleep_duration = 1
+        while True:
+            result = api.info.get_session(session_id=session_id)
+            if result['status'] == u'SUCC':
+                print_result('Async train result:', result)
+                break
+            time.sleep(sleep_duration)
+            sleep_duration = min(sleep_duration * 2, 60)
+
+def recognise_unknown_photo(user_id, url):
+    api = get_facepp_api()
+    result = api.recognition.recognize(url=url, group_name=user_id)
+    print_result('Recognize result:', result)
+    print '=' * 60
+    print 'The person with highest confidence:', \
+                    result['face'][0]['candidate'][0]['person_name']
 
 
 
@@ -156,8 +212,9 @@ if __name__ == '__main__':
     os.environ['DJANGO_SETTINGS_MODULE'] = 'djv.settings'
     sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
-    access_token = 'CAAUY1wWJW5wBAFlpcOkXeVYDF3CZCrDGYl0lkKJVDyVzLf9dOkxVeBUqTQZBgGIEXErOD53kYzEZA3DkYRm7ygp5GzI8xueBdb5wvtPGbZBZCfMZARIMqKZCKQzohGfuJhSY0VW7ZByhqh0OLvlMGLjcQ0BQrlLnjnpMyseFgnWwIZAdNdMo0fZAxI'
+    access_token = 'CAAUY1wWJW5wBAEBrArmxXrWc4kyAwtwoAQr6P0LdB3eg2oowpPW8Gg4y1WNMIWuuQ1s16ldzZCUfcfZAl1zqWwDuQqS5jGZC5QZAc7dqVkfLOvn7PwV7kmDN4qM5flxPsmiVP5dByg2iFc62VqOJgtUKcmRt7WytycdmENz0By1wSTMEnd2H'
 #    for d in get_fb_photos(access_token)['data']:
 #        fb_photo, fb_photo_tags = process_fb_photo(d, access_token)
 
-    train_lambda_album(get_fb_user(access_token).id)
+#    train_fb_photos(get_fb_user(access_token).id, 'http://104.130.3.99/media/')
+    recognise_unknown_photo(get_fb_user(access_token).id, 'https://scontent-a.xx.fbcdn.net/hphotos-frc3/t1.0-9/581275_10152858785155611_74591350_n.jpg')

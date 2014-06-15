@@ -3,3 +3,6 @@
 *.pyc
 *.sw*
 db.sqlite3
+djv/secret.json
+static
+media
