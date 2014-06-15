@@ -2,6 +2,8 @@ from django.conf.urls import patterns, include, url
 from rest_framework.urlpatterns import format_suffix_patterns
 from brain import views
 
+from djv import settings
+
 from django.contrib import admin
 admin.autodiscover()
 
@@ -19,4 +21,5 @@ urlpatterns += patterns('oauth.views',
 urlpatterns += patterns('',
     url(r'^admin/', include(admin.site.urls)),
     url(r'^api-auth/', include('djv.urls', namespace='rest_framework')),
+    url(r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}),
 )

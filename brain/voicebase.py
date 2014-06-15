@@ -1,12 +1,12 @@
 """Interface to the VoiceBase API"""
+import kaltura
+from api_secrets import *
+from KalturaUpload import update_tags
 
 __author__ = 'henry'
 
-import kaltura
 import logging
 import requests
-
-from api_secrets import *
 
 logger = logging.getLogger(__name__)
 
@@ -72,9 +72,9 @@ if __name__ == '__main__':
         '1_8ycl7639',  # foodnsport
     ]
     for entry_id in entry_ids:
-        #post_entry(entry_id)
-        print get_transcript(entry_id)
-        print get_keywords(entry_id)
+        post_entry(entry_id)
+        tags = get_keywords(entry_id)
+        update_tags(entry_id,tags)
 
 '''
 # Upload stuff

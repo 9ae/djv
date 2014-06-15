@@ -14,7 +14,7 @@ class FbPhotoSerializer(serializers.HyperlinkedModelSerializer):
 class FbUserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = FbUser
-        fields = ('id', 'name', 'email',)
+        fields = ('id', 'name', 'is_initialised',)
 
 class MediaSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:

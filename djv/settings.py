@@ -10,9 +10,9 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+BASE_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 
-from djv import get_api_secrets
+from djv.utils import get_api_secrets
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
@@ -41,6 +41,7 @@ INSTALLED_APPS = (
     'brain',
     'oauth',
     'rest_framework',
+    'djcelery',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -88,7 +89,13 @@ STATIC_URL = '/static/'
 
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static"),
+    os.path.join(BASE_DIR, "brain/static"),
 )
+
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+if not os.path.isdir(MEDIA_ROOT):
+    os.makedirs(MEDIA_ROOT)
 
 REST_FRAMEWORK = {
     # Use hyperlinked styles by default.
@@ -105,5 +112,27 @@ REST_FRAMEWORK = {
     'PAGINATE_BY': 10,
 }
 
-FACEBOOK_APP_ID = '640208246064856'
-FACEBOOK_APP_SECRET = '4ae40ff382e49fe75e550d45f6ec1443'
+LOG_DIR = os.path.join(BASE_DIR, 'logs')
+if not os.path.isdir(LOG_DIR):
+    os.makedirs(LOG_DIR)
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(LOG_DIR, 'debug.log'),
+        },
+    },
+    'loggers': {
+        'django.request': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
+
+BROKER_URL = 'django://'

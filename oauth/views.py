@@ -6,8 +6,8 @@ from django.http import HttpResponse
 from django.http import HttpResponseBadRequest
 from django.shortcuts import redirect
 
-from djv import get_api_secrets
-from djv import set_cookie
+from djv.utils import get_api_secrets
+from djv.utils import set_cookie
 
 
 def facebook(request):
