@@ -25,7 +25,7 @@ class MediaList(APIView):
     def post(self, request, format=None):
         # TODO: begin process of accessing external APIs and tagging
         # currently only creates a dummy media object
-        import pdb; pdb.set_trace()  # XXX BREAKPOINT
+        #import pdb; pdb.set_trace()  # XXX BREAKPOINT
 
         serializer = MediaSerializer(data=request.DATA)
         if serializer.is_valid():

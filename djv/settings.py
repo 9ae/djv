@@ -116,7 +116,7 @@ LOGGING = {
         'file': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(LOE_DIR, 'debug.log'),
+            'filename': os.path.join(LOG_DIR, 'debug.log'),
         },
     },
     'loggers': {
