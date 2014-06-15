@@ -3,7 +3,7 @@ import os
 import requests
 from api_secrets import *
 from KalturaUpload import update_tags
-from recognistion import recognise_unknown_photo, get_fb_user
+from recognition import recognise_unknown_photo, get_fb_user
 
 BASE_URL = 'http://rekognition.com/func/api/'
 STOCKPODIUM_URL = 'http://labs.stockpodium.com/adapi/tagging.php?'

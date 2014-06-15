@@ -46,23 +46,27 @@ class FbProfileDetail(APIView):
     """
 
     def get(self, request, format=None):
-        args = dict(access_token=request.GET.get('access_token', ''))
+        args = urllib.urlencode(dict(access_token=request.GET.get('access_token', '')))
         profile = json.load(urllib.urlopen('https://graph.facebook.com/me?%(args)s' % locals()))
-        fb_user = FbUser(id=profile['id'],
-                         name=profile['name'],
-                         is_initialised=False)
 
-        serializer = FbUserSerializer(fb_user)
+        serializer = FbUserSerializer()
+        if 'id' in profile:
+            fb_user = FbUser(id=profile['id'],
+                            name=profile['name'],
+                            is_initialised=False)
+            serializer = FbUserSerializer(fb_user)
+
         return Response(serializer.data)
 
     def post(self, request, format=None):
-        access_token=request.DATA.get('access_token', '')
-        args = dict(access_token=access_token)
-        profile = json.load(urllib.urlopen('https://graph.facebook.com/me?%(args)s' % locals()))
+        access_token = str(request.DATA.get('access_token', ''))
+        args = urllib.urlencode(dict(access_token=access_token))
+        url = 'https://graph.facebook.com/me?%(args)s' % locals()
+        profile = json.load(urllib.urlopen(url))
         fb_user, created = FbUser.objects.get_or_create(id=profile['id'],
                                                         name = profile['name'])
-        if created or not profile.is_initialised:
-            initialise_fb_user.delay(request.build_absolute_uri(), access_token)
+        if created or not fb_user.is_initialised:
+            initialise_fb_user('http://%s' % request.get_host(), access_token)
             fb_user.is_initialised = True
             fb_user.save()
 
@@ -91,9 +95,6 @@ class FbFriendList(APIView):
 
 @api_view(('GET',))
 def api_root(request, format=None):
-
-    add.delay(2,3)
-
     return Response({
         'medias': reverse('media-list', request=request, format=format),
         'fb_friends': reverse('fb-friends-list', request=request, format=format),

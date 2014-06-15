@@ -13,7 +13,7 @@ class FbPhoto(models.Model):
 class FbUser(models.Model):
     id = models.CharField(max_length=100, primary_key=True)
     name = models.CharField(max_length=100)
-    is_initialised = models.BooleanField()
+    is_initialised = models.BooleanField(default=False)
 
 
 class FbPhotoTag(models.Model):

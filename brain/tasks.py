@@ -26,10 +26,11 @@ def initialise_fb_user(domain_uri, access_token):
         process_fb_photo(d, access_token)
 
     filtered_photos = filter_fb_photos_for_training(group_name)
-    media_uri = urlparse.urljoin(domain_uri, 'media')
+    media_uri = urlparse.urljoin(domain_uri, 'media/')
 
-    results = ResultSet([upload_fb_photos_to_api.delay([p], group_name, media_uri) for p in filtered_photos])
-    results.join()
+    upload_fb_photos_to_api(filtered_photos, group_name, media_uri)
+#    results = ResultSet([upload_fb_photos_to_api.delay([p], group_name, media_uri) for p in filtered_photos])
+#    results.join()
 
     train_fb_photos(group_name)
 
