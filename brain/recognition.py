@@ -93,7 +93,7 @@ def process_fb_photo(fb_photo_obj, access_token, user_id='me'):
         for t in tags:
             source_image = Image.open(source_filename)
             tag_id = t['id']
-            tag_id = '%(photo_id)s.%(tag_id)s' % locals()
+            tag_id = '%(user_id)s.%(photo_id)s.%(tag_id)s' % locals()
             x = t['x']
             y = t['y']
 
@@ -126,7 +126,8 @@ def process_fb_photo(fb_photo_obj, access_token, user_id='me'):
 
     return fb_photo_tags
 
-def filter_fb_photos_for_training(fb_photo_tags, min_sample_size=20):
+
+def filter_fb_photos_for_training(fb_photo_tags, min_sample_size=10):
     name_counts = Counter([t['name'] for t in fb_photo_tags])
     name_counts = sorted(name_counts.items(), cmp=lambda x, y: cmp(x[1], y[1]), reverse=True)
     names = map(lambda x: x[0], filter(lambda x: x[1] >= min_sample_size, name_counts))
@@ -166,12 +167,16 @@ def upload_fb_photos_for_training(photos, group_name, media_uri):
         if len(result['face']) > 0:
             face_id = result['face'][0]['face_id']
             try:
-                api.person.create(person_name=p['name'], group_name=group_name, face_id=face_id)
+                api.person.create(person_name=p['name'],
+                                  group_name=group_name,
+                                  face_id=face_id)
             except APIError, e:
                 if e.code not in (453,):
                     raise
                 else:
-                    api.person.add_face(person_name=p['name'], face_id=face_id)
+                    api.person.add_face(person_name=p['name'],
+                                        group_name=group_name,
+                                        face_id=face_id)
 
 
 def train_fb_photos(group_name):
@@ -190,6 +195,7 @@ def train_fb_photos(group_name):
             break
         time.sleep(sleep_duration)
         sleep_duration = min(sleep_duration * 2, 60)
+
 
 def recognise_unknown_photo(group_name, url):
     api = get_facepp_api()
@@ -212,7 +218,8 @@ def clean_training_state(fb_photo_tags=[], group_name=None):
 
     for p in fb_photo_tags:
         f = os.path.join(settings.MEDIA_ROOT, p['image'])
-        os.unlink(f)
+        if os.path.isfile(f):
+            os.unlink(f)
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
