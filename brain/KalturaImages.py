@@ -42,7 +42,7 @@ def generate_images(entry_id):
     with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
         while i <= secs:
             executor.submit(get_image, entry_id, i)
-            i+=10
+            i+=3
     '''
     while i <= until:
         get_image(entry_id,i)
