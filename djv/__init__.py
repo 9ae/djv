@@ -3,8 +3,8 @@ import logging
 import os
 import json
 
-import kaltura
-import voicebase
+#import kaltura
+#import voicebase
 
 FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 logging.basicConfig(format=FORMAT, level=logging.INFO)

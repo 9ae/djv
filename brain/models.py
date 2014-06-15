@@ -1,17 +1,30 @@
-from django.contrib.auth.models import User
+import os
+
 from django.db import models
 
+from djv import settings
 
 class FbPhoto(models.Model):
-    id = models.IntegerField(primary_key=True)
+    id = models.CharField(max_length=100, primary_key=True)
+    name = models.CharField(max_length=200)
     url = models.URLField()
 
 
 class FbUser(models.Model):
-    id = models.IntegerField(primary_key=True)
+    id = models.CharField(max_length=100, primary_key=True)
     name = models.CharField(max_length=100)
-    email = models.EmailField()
 
+
+class FbPhotoTag(models.Model):
+    id = models.CharField(max_length=100, primary_key=True)
+    name = models.CharField(max_length=100)
+    image = models.ImageField(upload_to='facebook')
+    requestor = models.ForeignKey(FbUser)
+
+
+# create Facebook media directory if it does not exist
+if not os.path.isdir(os.path.join(settings.MEDIA_ROOT, 'facebook')):
+    os.makedirs(os.path.join(settings.MEDIA_ROOT, 'facebook'))
 
 class Tag(models.Model):
     CATEGORY = (
