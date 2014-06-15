@@ -13,7 +13,6 @@ def update_tags(entry_id, tags):
         new_tags = ', '.join(tags)
         if old_tags!=None and old_tags!='':
             new_tags = old_tags + ', ' +new_tags
-        new_tags = new_tags.replace(', ', ',')
         print 'new tags = '+new_tags
         # ks = GetKS()
         url = API_BASE_URL+'service=media&action=update&format=1&ks='+ks
