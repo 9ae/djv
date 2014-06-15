@@ -1,7 +1,6 @@
-import logging
+from __future__ import absolute_import
 
-#import kaltura
-#import voicebase
+import logging
 
 # This will make sure the app is always imported when
 # Django starts so that shared_task will use this app.
