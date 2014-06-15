@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 import os
 BASE_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 
-from djv import get_api_secrets
+from djv.utils import get_api_secrets
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
@@ -41,6 +41,7 @@ INSTALLED_APPS = (
     'brain',
     'oauth',
     'rest_framework',
+    'djcelery',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -106,7 +107,7 @@ REST_FRAMEWORK = {
 }
 
 LOG_DIR = os.path.join(BASE_DIR, 'logs')
-if not os.path.join(LOG_DIR):
+if not os.path.isdir(LOG_DIR):
     os.makedirs(LOG_DIR)
 
 LOGGING = {
@@ -116,7 +117,7 @@ LOGGING = {
         'file': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(LOE_DIR, 'debug.log'),
+            'filename': os.path.join(LOG_DIR, 'debug.log'),
         },
     },
     'loggers': {
@@ -128,4 +129,4 @@ LOGGING = {
     },
 }
 
-
+BROKER_URL = 'django://'
