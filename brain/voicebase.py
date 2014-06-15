@@ -7,6 +7,7 @@ import requests
 import kaltura
 
 from api_secrets import *
+from models import Media
 from KalturaUpload import update_tags
 
 logger = logging.getLogger(__name__)
@@ -69,12 +70,14 @@ def get_keywords(entry_id):
     return [kw['name'] for kw in data.get('keywords', [])]
 
 if __name__ == '__main__':
-    entry_ids = [
-        '1_p5vwu17n',  # Birdman
-        '1_84cxv1si',  # Evolution of Dad
-        '1_8ycl7639',  # foodnsport
-    ]
+    #entry_ids = [
+    #    '1_p5vwu17n',  # Birdman
+    #    '1_84cxv1si',  # Evolution of Dad
+    #    '1_8ycl7639',  # foodnsport
+    #]
+    entry_ids = [media.id for media in Media.objects.all()]
     for entry_id in entry_ids:
+        print 'Processing entry: ' + entry_id
         post_entry(entry_id)
         tags = get_keywords(entry_id)
         update_tags(entry_id,tags)
