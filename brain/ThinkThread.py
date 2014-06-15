@@ -22,3 +22,12 @@ def process_images(entry_id):
     tag_images_stock(entry_id)
     # face-recogn(entry_id)
 
+
+class ThinkThread(Thread):
+
+    def __init__(self, entry_id):
+        Thread.__init__(self)
+        self.entry_id = entry_id
+
+    def run(self):
+        generate_images(self.entry_id)
