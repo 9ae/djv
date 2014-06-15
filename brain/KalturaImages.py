@@ -1,7 +1,7 @@
 import requests
 from KalturaClient import *
 from KalturaClient.Plugins.Metadata import *
-
+import concurrent.futures
 from api_secrets import *
 
 
@@ -19,21 +19,25 @@ def GetKS():
     client = KalturaClient(config)
     return client.generateSession(ADMIN_SECRET, USER_NAME, KalturaSessionType.ADMIN, PARTNER_ID, 86400, "")
 
-def generateImages(entry_id):
+def get_image(entry_id,i):
+    req2_url = '{0}/thumbnail/entry_id/{1}/quality/100/vid_sec/{2}/width/800'.format(PUBLIC_BASE_URL,entry_id,i)
+    r2 = requests.get(req2_url)
+    file_location = '../static/images/'+entry_id+'-'+str(i)+'.jpg'
+    f = open(file_location,'wb')
+    f.write(r2.content)
+    f.close()
+    print 'written to '+file_location
+
+def generate_images(entry_id):
     ks = GetKS()
 
     r = requests.get(API_BASE_URL+'service=media&action=get&format=1&entryId='+entry_id+'&ks='+ks)
     data = r.json()
     secs = data['duration']
-    w = data['width']
-    h = data['height']
+
     i = 0
-    until = secs/3
-    while i <= until:
-        req2_url = '{0}/thumbnail/entry_id/{1}/quality/100/vid_sec/{2}/width/{3}/height/{4}'.format(PUBLIC_BASE_URL,entry_id,i,w,h)
-        print req2_url
-        r2 = requests.get(req2_url)
-        f = open('../static/images/'+entry_id+'-'+str(i)+'.jpg','wb')
-        f.write(r2.content)
-        f.close()
-        i+=1
+    until = secs/10
+    with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
+        while i <= until:
+            executor.submit(get_image, entry_id, i)
+            i+=1

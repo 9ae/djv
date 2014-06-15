@@ -1,12 +1,14 @@
 from threading import Thread
-from KalturaImages import generateImages
+from KalturaImages import generate_images
 from ReKImages import tag_images
+import concurrent.futures
+'''
+def complete_sampling():
+    print 'sampling video task complete'
 
-class ThinkThread(Thread):
+with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+    future = executor.submit(generateImages, '1_8ycl7639')
+    future.add_done_callback(complete_sampling)
+'''
 
-    def __init__(self, entry_id):
-        self.entry_id = entry_id
-
-    def run(self):
-        generateImages(self.entry_id)
-        tag_images(self.entry_id)
+generate_images('1_8ycl7639')
