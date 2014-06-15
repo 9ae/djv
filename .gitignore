@@ -1,9 +1,11 @@
 .ropeproject
 .venv
+.DS_Store
 *.pyc
 *.sw*
 db.sqlite3
 djv/secret.json
+brain/api_secrets.py
 logs
 media
 static
