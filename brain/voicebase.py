@@ -1,12 +1,10 @@
 """Interface to the VoiceBase API"""
+from brain import kaltura
 
 __author__ = 'henry'
 
-import kaltura
 import logging
 import requests
-
-from api_secrets import *
 
 logger = logging.getLogger(__name__)
 
