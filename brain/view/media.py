@@ -13,7 +13,7 @@ from page import Page
 class KVideo(webnode.Component):
     def __init__(self, entry_id, **kwargs):
         self.entry_id = entry_id
-        self.id = 'kvideo_{}'.format(id(self))
+        self.id = 'kvideo_{}_{}'.format(id(self), entry_id)
         self.kwargs = kwargs
 
     def tree(self):

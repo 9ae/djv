@@ -68,6 +68,10 @@ def get_entry_asset_id(entry_id, flavor_id=MP3_FLAVOR_ID):
     an MP3 audio file automatically for every video we upload. This function
     finds the asset id of the MP3 file.
     """
+    # Send Kaltura a command to convert the given entry. This will take some
+    # time, and won't be helpful for this call, but may be useful later.
+    convert_flavor_asset(entry_id, flavor_id)
+
     params = {
         'service': 'flavorAsset',
         'action': 'getbyentryid',
@@ -80,6 +84,24 @@ def get_entry_asset_id(entry_id, flavor_id=MP3_FLAVOR_ID):
                 return row['id']
     except:
         return None
+
+def convert_flavor_asset(entry_id, flavor_id=MP3_FLAVOR_ID):
+    """Ask Kaltura to convert a video entry to specified flavor"""
+    params = {
+        'service': 'flavorAsset',
+        'action': 'convert',
+    }
+    data = {
+        'entryId': entry_id,
+        'flavorParamsId': flavor_id,
+        'priority': 10,
+    }
+    ret = call_kaltura(params, post=True, data=data)
+    if isinstance(ret, dict) and ret.get(
+            'objectType', '') == 'KalturaAPIException':
+        logger.warning('Cannot convert entry {} to flavor {}'.format(
+                entry_id, flavor_id))
+        logger.warning(ret)
 
 def get_entry_download_url_with_flavor(entry_id, flavor_id=MP3_FLAVOR_ID):
     """Return download URL for the MP3 version of a Kaltura video"""
