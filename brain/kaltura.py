@@ -12,6 +12,7 @@ from KalturaClient.Plugins.Metadata import *
 logger = logging.getLogger(__name__)
 
 API_BASE_URL = 'http://www.kaltura.com/api_v3/index.php'
+MP3_FLAVOR_ID = 786871  # FlavorParamsID for MP3 file to be send to VoiceBase
 
 def get_ks():
     """Start new Kaltura API session and return key"""
@@ -48,19 +49,36 @@ def get_entry_download_url(entry_id):
     ret = get_entry_metadata(entry_id)
     try:
         url = ret['downloadUrl']
-        return URL
+        return url
     except:
         return None
 
-def get_entry_asset_id(entry_id, flavor_id=786152):
+def get_entry_duration(entry_id):
+    ret = get_entry_metadata(entry_id)
+    try:
+        duration = ret['msDuration']
+        return duration
+    except:
+        return None
+
+def get_entry_tags(entry_id):
+    ret = get_entry_metadata(entry_id)
+    try:
+        tags = ret['tags']
+        return tags
+    except:
+        return None
+
+def get_entry_asset_id(entry_id, flavor_id=MP3_FLAVOR_ID):
     """Return asset id for the MP3 version of a Kaltura video
 
     Kaltura stores the same video in multiple "flavors". We ask Kaltura to make
     an MP3 audio file automatically for every video we upload. This function
     finds the asset id of the MP3 file.
-
-    MP3 audio file has flavorParamsId = 786152.
     """
+    # Send Kaltura a command to convert the given entry. This will take some
+    # time, and won't be helpful for this call, but may be useful later.
+    #convert_flavor_asset(entry_id, flavor_id)
     params = {
         'service': 'flavorAsset',
         'action': 'getbyentryid',
@@ -74,7 +92,25 @@ def get_entry_asset_id(entry_id, flavor_id=786152):
     except:
         return None
 
-def get_entry_download_url_with_flavor(entry_id, flavor_id=786152):
+def convert_flavor_asset(entry_id, flavor_id=MP3_FLAVOR_ID):
+    """Ask Kaltura to convert a video entry to specified flavor"""
+    params = {
+        'service': 'flavorAsset',
+        'action': 'convert',
+    }
+    data = {
+        'entryId': entry_id,
+        'flavorParamsId': flavor_id,
+        'priority': 10,
+    }
+    ret = call_kaltura(params, post=True, data=data)
+    if isinstance(ret, dict) and ret.get(
+            'objectType', '') == 'KalturaAPIException':
+        logger.warning('Cannot convert entry {} to flavor {}'.format(
+                entry_id, flavor_id))
+        logger.warning(ret)
+
+def get_entry_download_url_with_flavor(entry_id, flavor_id=MP3_FLAVOR_ID):
     """Return download URL for the MP3 version of a Kaltura video"""
     asset_id = get_entry_asset_id(entry_id, flavor_id)
     if asset_id is None:

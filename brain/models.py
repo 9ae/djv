@@ -1,4 +1,5 @@
 import os
+import kaltura
 
 from django.db import models
 
@@ -50,3 +51,7 @@ class Media(models.Model):
 
     def __unicode__(self):
         return self.id
+
+    def get_kaltura_tags(self):
+        tags = kaltura.get_entry_tags(self.id)
+        return tags or []

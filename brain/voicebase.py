@@ -21,8 +21,13 @@ def post_entry(entry_id, transcription_type='human'):
 
     Transcription type can be either human or machine.
     """
+    duration = kaltura.get_entry_duration(entry_id)
+    if duration is None: return False
+    if duration <= 5000:
+        logger.debug('Entry {} is too short for voice tagging'.format(entry_id))
+        return False
     entry_url = kaltura.get_entry_download_url_with_flavor(entry_id)
-    if entry_url is None: return
+    if entry_url is None: return False
     params = {
         'apikey': VOICEBASE_APIKEY,
         'password': VOICEBASE_PASSWD,
