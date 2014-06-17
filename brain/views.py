@@ -1,6 +1,8 @@
 import json
 import urllib
 
+from django.shortcuts import render
+
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
@@ -94,9 +96,6 @@ class FbFriendList(APIView):
         serializer = FbUserSerializer([], many=True)
         return Response(serializer.data)
 
-
-
-
 @api_view(('GET',))
 def api_root(request, format=None):
     return Response({
@@ -104,3 +103,9 @@ def api_root(request, format=None):
         'fb_friends': reverse('fb-friends-list', request=request, format=format),
         'fb_profile_detail': reverse('fb-profile-detail', request=request, format=format),
     })
+
+def webview(request):
+    return render(request, 'brain/webview.html')
+
+def list(request, tag=''):
+    return render(request, 'brain/list.html')
