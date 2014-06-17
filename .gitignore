@@ -8,4 +8,4 @@ djv/secret.json
 brain/api_secrets.py
 logs
 media
-static
+static/images
