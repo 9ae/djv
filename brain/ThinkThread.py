@@ -1,6 +1,7 @@
 from threading import Thread
 from KalturaImages import generate_images
 from ReKImages import tag_images_stock, tag_people
+from voicebase import tag_voice
 import concurrent.futures
 '''
 def complete_sampling():
@@ -25,7 +26,7 @@ def process_images(entry_id):
 
 class ThinkThread(Thread):
 
-    def __init__(self, entry_id,access_token):
+    def __init__(self, entry_id, access_token):
         Thread.__init__(self)
         self.entry_id = entry_id
         self.access_token = access_token
@@ -35,5 +36,6 @@ class ThinkThread(Thread):
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
             object_future = executor.submit(tag_images_stock, self.entry_id)
-            human_future = executor.submit(tag_people, self.entry_id, self.access_token)
+            human_future  = executor.submit(tag_people, self.entry_id, self.access_token)
+            voice_future  = executor.submit(tag_voice, self.entry_id)
 
