@@ -36,8 +36,9 @@ class MediaPage(Page):
         z = []
         z += h.h1('List of all videos')
         for media in brain.models.Media.objects.all():
-            with h.div(style='width:400px').into(z):
-                z += KVideo(media.id)
+            with h.div(class_='col-md-3').into(z):
+                with h.div().into(z):
+                    z += KVideo(media.id)
                 tags = media.get_kaltura_tags()
                 with h.dl().into(z):
                     z += h.dt('tags')
