@@ -5,28 +5,39 @@ __author__ = 'henry'
 import logging
 import requests
 
-from api_secrets import *
 from KalturaClient import *
 from KalturaClient.Plugins.Metadata import *
+
+from djv import get_api_secrets
 
 logger = logging.getLogger(__name__)
 
 API_BASE_URL = 'http://www.kaltura.com/api_v3/index.php?'
 
 def GetConfig():
-    config = KalturaConfiguration(PARTNER_ID)
+    secrets = get_api_secrets()['kaltura']
+    config = KalturaConfiguration(secrets['partner_id'])
     config.serviceUrl = SERVICE_URL
     config.setLogger(logger)
     return config
 
+def get_session(client):
+    secrets = get_api_secrets()['kaltura']
+    return client.generateSession(secrets['admin_secrets'],
+                                  secrets['username'],
+                                  KalturaSessionType.ADMIN,
+                                  secrets['partner_id'],
+                                  86400,
+                                  '')
+
 def get_entry_metadata(entry_id):
     client = KalturaClient(GetConfig())
     # start new session (client session is enough when we do operations in a users scope)
-    ks = client.generateSession(ADMIN_SECRET, USER_NAME,
-            KalturaSessionType.ADMIN, PARTNER_ID, 86400, "")
+    ks = get_session(client)
     r = requests.get(API_BASE_URL +
         'service=media&action=get&format=1&entryId=' + entry_id + '&ks=' + ks)
-    return  r.json()
+
+    return r.json()
 
 def get_entry_download_url(entry_id):
     data = get_entry_metadata(entry_id)
@@ -45,8 +56,7 @@ def get_entry_download_url_with_flavor(entry_id, flavorParamsId=786152):
     """
     client = KalturaClient(GetConfig())
     # start new session (client session is enough when we do operations in a users scope)
-    ks = client.generateSession(ADMIN_SECRET, USER_NAME,
-            KalturaSessionType.ADMIN, PARTNER_ID, 86400, "")
+    ks = get_session(client)
 
     # First we need first the asset ID corresponding to the MP3 asset (786152)
     params = {'entryId': entry_id}

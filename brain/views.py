@@ -1,3 +1,5 @@
+import atexit
+import concurrent
 import json
 import urllib
 
@@ -12,7 +14,15 @@ from serializers import FbUserSerializer
 from serializers import MediaSerializer
 from tasks import initialise_fb_user
 
-from ThinkThread import ThinkThread
+from ThinkThread import think
+
+
+EXECUTOR = concurrent.futures.ThreadPoolExecutor(max_workers=4)
+def shutdown():
+    EXECUTOR.shutdown()
+
+atexit.register(shutdown)
+
 
 class MediaList(APIView):
     """
@@ -28,19 +38,21 @@ class MediaList(APIView):
         # TODO: begin process of accessing external APIs and tagging
         # currently only creates a dummy media object
         entry_id = request.DATA.get('id')
-        access_token = request.DATA.get('access_token')
+        import pdb; pdb.set_trace()  # XXX BREAKPOINT
+        services = request.DATA.get('services', {})
 
-        Media.objects.get_or_create(id=entry_id)
+        query = Media.objects.filter(id=entry_id)
+        media = None
+        if query.count():
+            media = query.get()
 
-        serializer = MediaSerializer(data=request.DATA, partial=True)
-#        if serializer.is_valid():
-#            serializer.save()
+        serializer = MediaSerializer(media, data={'id': entry_id})
+        if serializer.is_valid():
+            serializer.save()
+            think(entry_id, services)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-        main_thread = ThinkThread(entry_id,access_token)
-        main_thread.start()
-
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-#        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class FbProfileDetail(APIView):
@@ -75,11 +87,7 @@ class FbProfileDetail(APIView):
             fb_user.is_initialised = True
             fb_user.save()
 
-        serializer = FbUserSerializer(fb_user, data=request.DATA, partial=True)
-        if serializer.is_valid():
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(FbUserSerializer(fb_user).data, status=status.HTTP_201_CREATED)
 
 
 class FbFriendList(APIView):

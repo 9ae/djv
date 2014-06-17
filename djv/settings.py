@@ -41,7 +41,6 @@ INSTALLED_APPS = (
     'brain',
     'oauth',
     'rest_framework',
-    'djcelery',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -92,6 +91,8 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "brain/static"),
 )
 
+
+MEDIA_URL = '/media/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 if not os.path.isdir(MEDIA_ROOT):

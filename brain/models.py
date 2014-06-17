@@ -24,18 +24,21 @@ class FbPhotoTag(models.Model):
 
 
 class Tag(models.Model):
-    CATEGORY = (
+    CATEGORYS = (
+        ('HASHTAG', 'HashTag',),
+        ('KEYWORD', 'Keyword',),
         ('COLOR', 'Color',),
         ('FRIEND', 'Friend',),
-        ('KEYWORD', 'Keyword',),
+        ('GENDER', 'Gender',),
+        ('RACE', 'Race',),
         ('LANDMARK', 'Landmark',),
         ('SONG', 'Song',),
         ('OBJECT', 'Object',),
-        ('TRANSCRIPT', 'Transcript',),
     )
 
     name = models.CharField(max_length=100)
-    category = models.CharField(max_length=10, choices=CATEGORY, default='KEYWORD')
+    category = models.CharField(max_length=10, choices=CATEGORYS, default='HASHTAG')
+    timestamp = models.DateTimeField(auto_now=False, null=True)
 
     class Meta:
         unique_together = ('name', 'category',)
@@ -44,6 +47,25 @@ class Media(models.Model):
     # this should be the same identifier as KalturaBaseEntry.id
     # see http://www.kaltura.com/api_v3/testmeDoc/index.php?object=KalturaBaseEntry
     id = models.CharField(max_length=100, primary_key=True)
-
-#    user = models.ForeignKey(User)
     tags = models.ManyToManyField(Tag)
+
+class Status(models.Model):
+    SERVICES = (
+        ('FACEPP', 'Face++',),
+        ('STOCKPODIUM', 'Stockpodium',),
+        ('VOICEBASE', 'VoiceBase',),
+    )
+
+    STATES = (
+        ('NULL', 'Null',),
+        ('PROGRESS', 'Progress',),
+        ('SUCCESS', 'Success',),
+        ('FAIL', 'Fail',),
+    )
+
+    media = models.ForeignKey(Media)
+    service = models.CharField(max_length=12, choices=SERVICES)
+    state = models.CharField(max_length=10, choices=STATES, default=STATES)
+
+    class Meta:
+        unique_together = ('media', 'service',)
