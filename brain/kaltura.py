@@ -81,7 +81,7 @@ def get_entry_download_url_with_flavor(entry_id, flavor_id=786152):
         logger.warn('Cannot find asset with flavor {} for entry {}.'.format(
                 flavor_id, entry_id))
         return None
-    logger.info('Found asset {} with flavor {} for entry {}.'.format(
+    logger.debug('Found asset {} with flavor {} for entry {}.'.format(
             asset_id, flavor_id, entry_id))
     params = {
         'service': 'flavorAsset',
@@ -89,8 +89,10 @@ def get_entry_download_url_with_flavor(entry_id, flavor_id=786152):
         'id': asset_id,
     }
     ret = call_kaltura(params, post=False)
-    if ret.startswith('http'):
-        return ret
+    if isinstance(ret, basestring) and ret.startswith('http'):
+        url = ret
+        logger.debug('Found download URL for asset {}: {}'.format(asset_id, url))
+        return url
     else:
         logger.warn('Cannot find download URL for asset {}.'.format(asset_id))
         logger.warn(ret)
