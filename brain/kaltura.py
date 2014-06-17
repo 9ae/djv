@@ -70,8 +70,7 @@ def get_entry_asset_id(entry_id, flavor_id=MP3_FLAVOR_ID):
     """
     # Send Kaltura a command to convert the given entry. This will take some
     # time, and won't be helpful for this call, but may be useful later.
-    convert_flavor_asset(entry_id, flavor_id)
-
+    #convert_flavor_asset(entry_id, flavor_id)
     params = {
         'service': 'flavorAsset',
         'action': 'getbyentryid',
