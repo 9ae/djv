@@ -106,3 +106,6 @@ def api_root(request, format=None):
 
 def webview(request):
     return render(request, 'brain/webview.html')
+
+def list(request, tag=''):
+    return render(request, 'brain/list.html')

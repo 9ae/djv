@@ -13,6 +13,7 @@ urlpatterns = format_suffix_patterns(patterns('brain.views',
     url(r'^fb_friend/$', views.FbFriendList.as_view(), name='fb-friends-list'),
     url(r'^fb_profile/$', views.FbProfileDetail.as_view(), name='fb-profile-detail'),
     url(r'^web$', views.webview, name='webview'),
+    url(r'^list$', views.list, name='list'),
 ))
 
 urlpatterns += patterns('oauth.views',
