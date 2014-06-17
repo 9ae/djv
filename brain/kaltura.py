@@ -52,6 +52,14 @@ def get_entry_download_url(entry_id):
     except:
         return None
 
+def get_entry_tags(entry_id):
+    ret = get_entry_metadata(entry_id)
+    try:
+        tags = ret['tags']
+        return tags
+    except:
+        return None
+
 def get_entry_asset_id(entry_id, flavor_id=786152):
     """Return asset id for the MP3 version of a Kaltura video
 

@@ -7,6 +7,8 @@ from djv import settings
 from django.contrib import admin
 admin.autodiscover()
 
+import brain.view
+
 urlpatterns = format_suffix_patterns(patterns('brain.views',
     url(r'^$', 'api_root'),
     url(r'^media/$', views.MediaList.as_view(), name='media-list'),
@@ -14,6 +16,7 @@ urlpatterns = format_suffix_patterns(patterns('brain.views',
     url(r'^fb_profile/$', views.FbProfileDetail.as_view(), name='fb-profile-detail'),
     url(r'^web$', views.webview, name='webview'),
     url(r'^list$', views.list, name='list'),
+    url(r'^webnode/media$', brain.view.media.mediapage, name='webnode_mediapage'),
 ))
 
 urlpatterns += patterns('oauth.views',
