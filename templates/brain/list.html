@@ -13,17 +13,22 @@
             background-color: #888;
         }
 
-                .search input[type="text"] {
+         .search input[type="text"] {
             border-top: none;
             border-left:none;
             border-right:none;
             border-bottom:1px solid orangered;
             background:none;
             color:#fff;
+            display:inline;
         }
 
         .search {
             padding-top: 20px;
+        }
+
+        .search button{
+             display:inline;
         }
 
         div.tag {
@@ -47,17 +52,19 @@
             display:inline;
             margin:5px;
             border:#888888 solid 4px;
+            max-height:68px;
+            max-width: 120px;
 
         }
     </style>
 </head>
 <body>
 
-<div class="search">
-    <div class="col-lg-10 col-md-10 col-sm-5 col-xs-5">
+<div class="search row">
+    <div class="col-lg-9 col-md-9 col-sm-5 col-xs-5">
        <ul id="tag-cloud"></ul>
     </div>
-    <div class="col-lg-2 col-md-2 col-sm-5 col-xs-5">
+    <div class="col-lg-3 col-md-3 col-sm-5 col-xs-5">
         <div id="tag-warning" class="input-append">
   <input type="text">
   <button class="btn btn-warning" type="button"><span class="glyphicon glyphicon-plus"></span></button>
@@ -67,7 +74,7 @@
 <input type="hidden" id="ks" value="{{ ks }}" />
 <input type="hidden" id="partner" value="{{ partnerId }}" />
 
-<div id="listContent">
+<div id="listContent" class="row">
 
 </div>
 
