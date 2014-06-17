@@ -20,6 +20,7 @@ def post_entry(entry_id, transcription_type='human'):
     Transcription type can be either human or machine.
     """
     entry_url = kaltura.get_entry_download_url_with_flavor(entry_id)
+    if entry_url is None: return
     params = {
         'apikey': VOICEBASE_APIKEY,
         'password': VOICEBASE_PASSWD,
@@ -29,8 +30,12 @@ def post_entry(entry_id, transcription_type='human'):
         'title': entry_id,
         'externalid': entry_id,
     }
-    r = requests.get(API_URL, params=params)
-    print 'VoiceBase returned: %s' % r.content
+    ret = requests.get(API_URL, params=params).json()
+    if ret.get('requestStatus') == 'SUCCESS':
+        logger.info('Successfully post entry {}'.format(entry_id))
+    else:
+        logger.warn('Cannot post entry {}'.format(entry_id))
+        logger.warn(ret)
 
 def get_transcript(entry_id):
     """Return the transcript for a Kaltura entry
@@ -44,11 +49,13 @@ def get_transcript(entry_id):
         'externalID': entry_id,
         'confidence': 0.75,
     }
-    r = requests.post(API_URL, data=params)
-    logger.info('VoiceBase returned for getting entry %s: %s' % (
-            entry_id, r.content))
-    data = r.json()
-    return data.get('transcript', None)
+    ret = requests.post(API_URL, data=params).json()
+    try:
+        return ret['transcript']
+    except:
+        logger.warn('Cannot find transcript for entry {}.'.format(entry_id))
+        logger.warn(ret)
+        return None
 
 def get_keywords(entry_id):
     """Return a list of keywords of a Kaltura entry
@@ -63,24 +70,27 @@ def get_keywords(entry_id):
         'externalID': entry_id,
         'format': 'txt',
     }
-    r = requests.post(API_URL, data=params)
-    logger.info('VoiceBase returned for getting entry %s: %s' % (
-            entry_id, r.content))
-    data = r.json()
-    return [kw['name'] for kw in data.get('keywords', [])]
+    ret = requests.post(API_URL, data=params).json()
+    try:
+        keywords = [kw['name'] for kw in ret['keywords']]
+        logging.debug(keywords)
+        return keywords
+    except:
+        logger.warn('Cannot find keywords for entry {}.'.format(entry_id))
+        logger.warn(ret)
+        return None
 
-if __name__ == '__main__':
-    #entry_ids = [
-    #    '1_p5vwu17n',  # Birdman
-    #    '1_84cxv1si',  # Evolution of Dad
-    #    '1_8ycl7639',  # foodnsport
-    #]
-    entry_ids = [media.id for media in Media.objects.all()]
-    for entry_id in entry_ids:
-        print 'Processing entry: ' + entry_id
+def main():
+    for media in Media.objects.all():
+        entry_id = media.id
+        logging.debug('Processing entry: {}'.format(entry_id))
         post_entry(entry_id)
         tags = get_keywords(entry_id)
-        update_tags(entry_id,tags)
+        if tags is not None and len(tags) > 0:
+            update_tags(entry_id,tags)
+
+if __name__ == '__main__':
+    main()
 
 '''
 # Upload stuff

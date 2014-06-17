@@ -45,5 +45,8 @@ class Media(models.Model):
     # see http://www.kaltura.com/api_v3/testmeDoc/index.php?object=KalturaBaseEntry
     id = models.CharField(max_length=100, primary_key=True)
 
-#    user = models.ForeignKey(User)
+    # user = models.ForeignKey(User)
     tags = models.ManyToManyField(Tag)
+
+    def __unicode__(self):
+        return self.id
