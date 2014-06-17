@@ -112,6 +112,21 @@ REST_FRAMEWORK = {
     'PAGINATE_BY': 10,
 }
 
+# List of callables that know how to import templates from various sources.
+TEMPLATE_LOADERS = (
+    'django.template.loaders.filesystem.Loader',
+    'django.template.loaders.app_directories.Loader',
+     'django.template.loaders.eggs.Loader',
+)
+
+TEMPLATE_CONTENT_PROCESSORS = (
+    'django.contrib.messages.context_processors.messages',
+)
+
+TEMPLATE_DIRS = (
+    os.path.join(BASE_DIR, "templates"),
+)
+
 LOG_DIR = os.path.join(BASE_DIR, 'logs')
 if not os.path.isdir(LOG_DIR):
     os.makedirs(LOG_DIR)
