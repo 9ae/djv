@@ -25,3 +25,5 @@ Following are steps to create a new development environment.
 4. Run development HTTP server.
 
         python manage.py runserver
+
+iOS: https://github.com/IRIS089/DejaVu

@@ -23,10 +23,6 @@ class FbPhotoTag(models.Model):
     requestor = models.ForeignKey(FbUser)
 
 
-# create Facebook media directory if it does not exist
-if not os.path.isdir(os.path.join(settings.MEDIA_ROOT, 'facebook')):
-    os.makedirs(os.path.join(settings.MEDIA_ROOT, 'facebook'))
-
 class Tag(models.Model):
     CATEGORY = (
         ('COLOR', 'Color',),

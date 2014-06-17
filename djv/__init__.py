@@ -7,4 +7,4 @@ import logging
 from .celery import app as celery_app
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.INFO)
+                    level=logging.DEBUG)

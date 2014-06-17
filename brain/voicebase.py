@@ -1,32 +1,36 @@
 """Interface to the VoiceBase API"""
-import kaltura
-from api_secrets import *
-from KalturaUpload import update_tags
 
 __author__ = 'henry'
 
 import logging
 import requests
+import kaltura
+
+from api_secrets import *
+from models import Media
+from KalturaUpload import update_tags
 
 logger = logging.getLogger(__name__)
 
 API_URL = 'https://www.VoiceBase.com/services?version=1.0'
 
-def post_entry(entry_id):
-    """Post a Kaltura entry to VoiceBase for transcription"""
+def post_entry(entry_id, transcription_type='human'):
+    """Post a Kaltura entry to VoiceBase for transcription
+
+    Transcription type can be either human or machine.
+    """
     entry_url = kaltura.get_entry_download_url_with_flavor(entry_id)
     params = {
         'apikey': VOICEBASE_APIKEY,
         'password': VOICEBASE_PASSWD,
         'action': 'uploadMediaGet',
         'mediaURL': entry_url,
-        'transcriptType': 'machine',
+        'transcriptType': transcription_type,
         'title': entry_id,
         'externalid': entry_id,
     }
     r = requests.get(API_URL, params=params)
-    logger.info('VoiceBase returned for posting entry %s: %s' % (
-            entry_id, r.content))
+    print 'VoiceBase returned: %s' % r.content
 
 def get_transcript(entry_id):
     """Return the transcript for a Kaltura entry
@@ -66,12 +70,14 @@ def get_keywords(entry_id):
     return [kw['name'] for kw in data.get('keywords', [])]
 
 if __name__ == '__main__':
-    entry_ids = [
-        '1_p5vwu17n',  # Birdman
-        '1_84cxv1si',  # Evolution of Dad
-        '1_8ycl7639',  # foodnsport
-    ]
+    #entry_ids = [
+    #    '1_p5vwu17n',  # Birdman
+    #    '1_84cxv1si',  # Evolution of Dad
+    #    '1_8ycl7639',  # foodnsport
+    #]
+    entry_ids = [media.id for media in Media.objects.all()]
     for entry_id in entry_ids:
+        print 'Processing entry: ' + entry_id
         post_entry(entry_id)
         tags = get_keywords(entry_id)
         update_tags(entry_id,tags)
