@@ -33,14 +33,23 @@ def get_image(entry_id,i):
     f.close()
 
 def generate_images(entry_id):
+    import time
     ks = GetKS()
     os.chdir(os.path.join(settings.MEDIA_ROOT, 'static/images/'))
 
-    r = requests.get(API_BASE_URL+'service=media&action=get&format=1&entryId='+entry_id+'&ks='+ks)
+    entry_url = API_BASE_URL+'service=media&action=get&format=1&entryId='+entry_id+'&ks='+ks
+    r = requests.get(entry_url)
     data = r.json()
 
-    if 'duration' not in data:
-        raise Exception(data)
+    retry = 5
+    while 'duration' not in data:
+        time.sleep(60)
+        r = requests.get(entry_url)
+        data = r.json()
+        retry -= 1
+
+        if retry < 0:
+            raise Excpetion('Cannot find video on Kaltura')
 
     secs = data['duration']
 
