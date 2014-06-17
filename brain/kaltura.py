@@ -53,6 +53,14 @@ def get_entry_download_url(entry_id):
     except:
         return None
 
+def get_entry_duration(entry_id):
+    ret = get_entry_metadata(entry_id)
+    try:
+        duration = ret['msDuration']
+        return duration
+    except:
+        return None
+
 def get_entry_tags(entry_id):
     ret = get_entry_metadata(entry_id)
     try:
