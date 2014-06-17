@@ -10,8 +10,8 @@ from djv.utils import get_api_secrets
 BASE_URL = 'http://rekognition.com/func/api/'
 STOCKPODIUM_URL = 'http://labs.stockpodium.com/adapi/tagging.php?'
 
-IMAGES_DIR = os.path.join(settings.MEDIA_ROOT, 'kaltura')
-IMAGES_BASE_URL = 'http://104.130.3.99/media/kaltura/'
+IMAGES_DIR = os.path.join(settings.MEDIA_ROOT)
+IMAGES_BASE_URL = 'http://104.130.3.99/media/'
 
 SCENE_THRESHOLD = 0.05
 OBJECT_THRESHOLD = 30.0

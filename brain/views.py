@@ -19,7 +19,6 @@ from tasks import initialise_fb_user
 from djv.utils import get_api_secrets
 
 from KalturaImages import GetKS
-from api_secrets import PARTNER_ID
 from ThinkThread import ThinkThread
 from ThinkThread import think
 

@@ -41,7 +41,7 @@ def get_image(entry_id,i):
 
 def generate_images(entry_id):
     ks = GetKS()
-    os.chdir(os.path.join(settings.MEDIA_ROOT, 'kaltura'))
+    os.chdir(os.path.join(settings.MEDIA_ROOT))
 
     r = requests.get(API_BASE_URL+'service=media&action=get&format=1&entryId='+entry_id+'&ks='+ks)
     data = r.json()

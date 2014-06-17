@@ -81,4 +81,3 @@ class Status(models.Model):
 
     class Meta:
         unique_together = ('media', 'service',)
->>>>>>> hoyinlai
