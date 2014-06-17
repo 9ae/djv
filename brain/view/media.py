@@ -6,9 +6,10 @@ import brain
 import brain.webnode as webnode
 import brain.webnode.html as h
 
-from brain.api_secrets import PARTNER_ID
 from django.http import HttpResponse
 from page import Page
+
+from djv.utils import get_api_secrets
 
 class KVideo(webnode.Component):
     def __init__(self, entry_id, **kwargs):
@@ -17,6 +18,7 @@ class KVideo(webnode.Component):
         self.kwargs = kwargs
 
     def tree(self):
+        secrets = get_api_secrets()['kaltura']
         z = []
         z += h.div(id = self.id, **self.kwargs)
         with h.script(type='text/javascript').into(z):
@@ -28,7 +30,7 @@ kWidget.embed({
     'uiconf_id': '24670302',
     'entry_id': '%s',
 });
-''' % (self.id, PARTNER_ID, self.entry_id))
+''' % (self.id, secrets['partner_id'], self.entry_id))
         return z
 
 class MediaPage(Page):

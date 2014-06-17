@@ -2,26 +2,33 @@ import requests
 from KalturaClient import *
 from KalturaClient.Plugins.Metadata import *
 import concurrent.futures
-from api_secrets import *
 import os
 import os.path
 
 from djv import settings
+from djv.utils import get_api_secrets
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 API_BASE_URL = 'http://www.kaltura.com/api_v3/index.php?'
-PUBLIC_BASE_URL = 'http://www.kaltura.com/p/'+str(PARTNER_ID)
+PUBLIC_BASE_URL = 'http://www.kaltura.com/p/%(partner_id)s' % get_api_secrets()['kaltura']
+SERVICE_URL = "http://www.kaltura.com"
 
 def GetClient():
-    config = KalturaConfiguration(PARTNER_ID)
+    secrets = get_api_secrets()['kaltura']
+    config = KalturaConfiguration(secrets['partner_id'])
     config.serviceUrl = SERVICE_URL
     return KalturaClient(config)
 
 def GetKS():
-    config = KalturaConfiguration(PARTNER_ID)
+    secrets = get_api_secrets()['kaltura']
+    config = KalturaConfiguration(secrets['partner_id'])
     config.serviceUrl = SERVICE_URL
     client = KalturaClient(config)
-    return client.generateSession(ADMIN_SECRET, USER_NAME, KalturaSessionType.ADMIN, PARTNER_ID, 86400, "")
+    return client.generateSession(secrets['admin_secret'],
+                                  secrets['username'],
+                                  KalturaSessionType.ADMIN,
+                                  secrets['partner_id'],
+                                  86400, "")
 
 def get_image(entry_id,i):
     req2_url = '{0}/thumbnail/entry_id/{1}/quality/100/vid_sec/{2}/width/800'.format(PUBLIC_BASE_URL,entry_id,i)
@@ -35,7 +42,7 @@ def get_image(entry_id,i):
 def generate_images(entry_id):
     import time
     ks = GetKS()
-    os.chdir(os.path.join(settings.MEDIA_ROOT, 'static/images/'))
+    os.chdir(os.path.join(settings.MEDIA_ROOT))
 
     entry_url = API_BASE_URL+'service=media&action=get&format=1&entryId='+entry_id+'&ks='+ks
     r = requests.get(entry_url)

@@ -3,22 +3,47 @@
 <head lang="en">
     <meta charset="UTF-8">
     <script type="text/javascript" src="/static/js/jq.js"></script>
+        <script type="text/javascript" src="static/bootstrap/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="/static/kaltura/minified/kaltura.min.js"></script>
     <title>Deja Vu: list</title>
+        <link rel="stylesheet" type="css/" href="static/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="css/" href="static/css/bootstrap-tag-cloud.css" />
     <style type="text/css">
         body {
             background-color: #888;
         }
 
-        .search  {
-            width:100%;
+         .search input[type="text"] {
+            border-top: none;
+            border-left:none;
+            border-right:none;
+            border-bottom:1px solid orangered;
+            background:none;
+            color:#fff;
+            display:inline;
         }
 
-         .tag {
-            min-height: 20px;
-            min-width: 50px;
+        .search {
+            padding-top: 20px;
+        }
+
+        .search button{
+             display:inline;
+        }
+
+        div.tag {
+            display:inline;
+            margin:2px;
+        }
+
+        .tag.label {
             background-color: orangered;
-            color:#fff;
+            font-size:16px;
+        }
+
+        .tag span.glyphicon {
+            background-color: white;
+            color:orangered;
         }
 
         a img {border:none;}
@@ -27,19 +52,29 @@
             display:inline;
             margin:5px;
             border:#888888 solid 4px;
+            max-height:68px;
+            max-width: 120px;
 
         }
     </style>
 </head>
 <body>
 
-<div class="search">
- <div class="tag">{{ tag }}</div>
+<div class="search row">
+    <div class="col-lg-9 col-md-9 col-sm-5 col-xs-5">
+       <ul id="tag-cloud"></ul>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-5 col-xs-5">
+        <div id="tag-warning" class="input-append">
+  <input type="text">
+  <button class="btn btn-warning" type="button"><span class="glyphicon glyphicon-plus"></span></button>
+</div></div>
 </div>
+
 <input type="hidden" id="ks" value="{{ ks }}" />
 <input type="hidden" id="partner" value="{{ partnerId }}" />
 
-<div id="listContent">
+<div id="listContent" class="row">
 
 </div>
 
@@ -48,7 +83,7 @@
     <input type="file" id="file" name="fileData" /><input type="submit" value="upload" id="do_upload" />
     </form>
 </div>
-
+<script type="text/javascript" src="static/js/bootstrap-tag-cloud.js"></script>
 <script type="text/javascript" src="/static/js/list.js"></script>
 </body>
 </html>
