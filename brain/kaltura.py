@@ -49,7 +49,7 @@ def get_entry_download_url(entry_id):
     ret = get_entry_metadata(entry_id)
     try:
         url = ret['downloadUrl']
-        return URL
+        return url
     except:
         return None
 
