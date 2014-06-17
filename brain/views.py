@@ -19,8 +19,7 @@ from ThinkThread import think
 
 EXECUTOR = concurrent.futures.ThreadPoolExecutor(max_workers=4)
 def shutdown():
-    EXECUTOR.shutdown()
-
+    EXECUTOR.shutdown(wait=True)
 atexit.register(shutdown)
 
 
@@ -79,11 +78,11 @@ class FbProfileDetail(APIView):
         args = urllib.urlencode(dict(access_token=access_token))
         url = 'https://graph.facebook.com/me?%(args)s' % locals()
         profile = json.load(urllib.urlopen(url))
-        fb_user, created = FbUser.objects.get_or_create(id=profile['id'],
-                                                        name = profile['name'])
+        fb_user, created = FbUser.objects.get_or_create(id=profile['id'])
         if force_initialise or created or not fb_user.is_initialised:
             initialise_fb_user('http://%s' % request.get_host(), access_token)
             fb_user.is_initialised = True
+            fb_user.name = profile['name']
             fb_user.save()
 
         return Response(FbUserSerializer(fb_user).data, status=status.HTTP_201_CREATED)

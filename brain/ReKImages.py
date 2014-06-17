@@ -66,7 +66,7 @@ def tag_people(entry_id,access_token):
 
     for filename in files_list:
         candidate = recognise_unknown_photo(get_fb_user(access_token).id, IMAGES_BASE_URL+filename)
-        if not(candidate in tags):
+        if candidate is not None and candidate not in tags:
             tags.append(candidate)
 
     update_tags(entry_id,tags)

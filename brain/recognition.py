@@ -157,15 +157,18 @@ def upload_fb_photos_for_training(photos, group_name, media_uri):
 
     for p in photos:
         logging.info('Uploading file for training: "%s"' % os.path.basename(p['image']))
+        name = p['name']
 
         # upload images for associated names to recognise face
         url = urlparse.urljoin(media_uri, p['image'])
         result = api.detection.detect(url=url, mode='oneface')
-        log_result('Detection result for {}:'.format(p['name']), result)
 
         # create person with associated face
         if len(result['face']) > 0:
             face_id = result['face'][0]['face_id']
+            logging.info('Associate [%(face_id)s]%(name)s with group: "%(group_name)s"' % locals())
+            log_result('Detection result for %s:' % name, result)
+
             try:
                 api.person.create(person_name=p['name'],
                                   group_name=group_name,
@@ -201,9 +204,12 @@ def recognise_unknown_photo(group_name, url):
     api = get_facepp_api()
     result = api.recognition.recognize(url=url, group_name=group_name)
     log_result('Recognize Result:', result)
+    person = None
+    if len(result['face']) != 0:
+        person = result['face'][0]['candidate'][0]['person_name']
     print '=' * 60
-    print 'The person with highest confidence:', result['face'][0]['candidate'][0]['person_name']
-    return result['face'][0]['candidate'][0]['person_name']
+    print 'The person with highest confidence:', person
+    return person
 
 
 def clean_training_state(fb_photo_tags=[], group_name=None):
