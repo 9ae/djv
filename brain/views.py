@@ -38,7 +38,6 @@ class MediaList(APIView):
         # TODO: begin process of accessing external APIs and tagging
         # currently only creates a dummy media object
         entry_id = request.DATA.get('id')
-        import pdb; pdb.set_trace()  # XXX BREAKPOINT
         services = request.DATA.get('services', {})
 
         query = Media.objects.filter(id=entry_id)
