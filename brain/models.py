@@ -13,7 +13,7 @@ class FbPhoto(models.Model):
 
 class FbUser(models.Model):
     id = models.CharField(max_length=100, primary_key=True)
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, null=True)
     is_initialised = models.BooleanField(default=False)
 
 
@@ -25,18 +25,21 @@ class FbPhotoTag(models.Model):
 
 
 class Tag(models.Model):
-    CATEGORY = (
+    CATEGORYS = (
+        ('HASHTAG', 'HashTag',),
+        ('KEYWORD', 'Keyword',),
         ('COLOR', 'Color',),
         ('FRIEND', 'Friend',),
-        ('KEYWORD', 'Keyword',),
+        ('GENDER', 'Gender',),
+        ('RACE', 'Race',),
         ('LANDMARK', 'Landmark',),
         ('SONG', 'Song',),
         ('OBJECT', 'Object',),
-        ('TRANSCRIPT', 'Transcript',),
     )
 
     name = models.CharField(max_length=100)
-    category = models.CharField(max_length=10, choices=CATEGORY, default='KEYWORD')
+    category = models.CharField(max_length=10, choices=CATEGORYS, default='HASHTAG')
+    timestamp = models.DateTimeField(auto_now=False, null=True)
 
     class Meta:
         unique_together = ('name', 'category',)
@@ -55,3 +58,27 @@ class Media(models.Model):
     def get_kaltura_tags(self):
         tags = kaltura.get_entry_tags(self.id)
         return tags or []
+
+    tags = models.ManyToManyField(Tag)
+
+class Status(models.Model):
+    SERVICES = (
+        ('FACEPP', 'Face++',),
+        ('STOCKPODIUM', 'Stockpodium',),
+        ('VOICEBASE', 'VoiceBase',),
+    )
+
+    STATES = (
+        ('NULL', 'Null',),
+        ('PROGRESS', 'Progress',),
+        ('SUCCESS', 'Success',),
+        ('FAIL', 'Fail',),
+    )
+
+    media = models.ForeignKey(Media)
+    service = models.CharField(max_length=12, choices=SERVICES)
+    state = models.CharField(max_length=10, choices=STATES, default=STATES)
+
+    class Meta:
+        unique_together = ('media', 'service',)
+>>>>>>> hoyinlai

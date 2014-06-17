@@ -5,9 +5,10 @@ __author__ = 'henry'
 import logging
 import requests
 
-from api_secrets import *
 from KalturaClient import *
 from KalturaClient.Plugins.Metadata import *
+
+from djv.utils import get_api_secrets
 
 logger = logging.getLogger(__name__)
 
@@ -16,13 +17,17 @@ MP3_FLAVOR_ID = 786871  # FlavorParamsID for MP3 file to be send to VoiceBase
 
 def get_ks():
     """Start new Kaltura API session and return key"""
-    config = KalturaConfiguration(PARTNER_ID)
+    secrets = get_api_secrets()['kaltura']
+    config = KalturaConfiguration(secrets['kaltura'])
     config.serviceUrl = SERVICE_URL
     #config.setLogger(logger)
     client = KalturaClient(config)
-    ks = client.generateSession(ADMIN_SECRET, USER_NAME,
-            KalturaSessionType.ADMIN, PARTNER_ID, 86400, "")
-    return ks
+    return client.generateSession(secrets['admin_secrets'],
+                                  secrets['username'],
+                                  KalturaSessionType.ADMIN,
+                                  secrets['partner_id'],
+                                  86400,
+                                  '')
 
 def call_kaltura(params, post=False, **kwargs):
     _params = {
@@ -76,6 +81,7 @@ def get_entry_asset_id(entry_id, flavor_id=MP3_FLAVOR_ID):
     an MP3 audio file automatically for every video we upload. This function
     finds the asset id of the MP3 file.
     """
+<<<<<<< HEAD
     # Send Kaltura a command to convert the given entry. This will take some
     # time, and won't be helpful for this call, but may be useful later.
     #convert_flavor_asset(entry_id, flavor_id)
@@ -109,6 +115,11 @@ def convert_flavor_asset(entry_id, flavor_id=MP3_FLAVOR_ID):
         logger.warning('Cannot convert entry {} to flavor {}'.format(
                 entry_id, flavor_id))
         logger.warning(ret)
+=======
+    client = KalturaClient(GetConfig())
+    # start new session (client session is enough when we do operations in a users scope)
+    ks = get_session(client)
+>>>>>>> hoyinlai
 
 def get_entry_download_url_with_flavor(entry_id, flavor_id=MP3_FLAVOR_ID):
     """Return download URL for the MP3 version of a Kaltura video"""
