@@ -3,28 +3,46 @@
 <head lang="en">
     <meta charset="UTF-8">
     <script type="text/javascript" src="/static/js/jq.js"></script>
+    <script type="text/javascript" src="/static/kaltura/minified/kaltura.min.js"></script>
     <title>Deja Vu: list</title>
     <style type="text/css">
         body {
             background-color: #888;
         }
 
-        .search input[type="text"] {
-            border-top: none;
-            border-left:none;
-            border-right:none;
-            border-bottom:1px solid orangered;
-            background:none;
+        .search  {
+            width:100%;
+        }
+
+         .tag {
+            min-height: 20px;
+            min-width: 50px;
+            background-color: orangered;
+            color:#fff;
+        }
+
+        a img {border:none;}
+
+        div.media-th {
+            display:inline;
+            margin:5px;
+            border:#888888 solid 4px;
+
         }
     </style>
 </head>
 <body>
 
 <div class="search">
+ <div class="tag">{{ tag }}</div>
+</div>
+<input type="hidden" id="ks" value="{{ ks }}" />
+<input type="hidden" id="partner" value="{{ partnerId }}" />
+
+<div id="listContent">
 
 </div>
 
-
-<script type="text/javascript" src="/static/js/search.js"></script>
+<script type="text/javascript" src="/static/js/list.js"></script>
 </body>
 </html>

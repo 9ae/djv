@@ -14,7 +14,10 @@ from serializers import FbUserSerializer
 from serializers import MediaSerializer
 from tasks import initialise_fb_user
 
+from KalturaImages import GetKS
+from api_secrets import PARTNER_ID
 from ThinkThread import ThinkThread
+
 
 class MediaList(APIView):
     """
@@ -108,4 +111,5 @@ def webview(request):
     return render(request, 'brain/webview.html')
 
 def list(request, tag=''):
-    return render(request, 'brain/list.html')
+    content = {'ks':GetKS(),'tag':tag , 'partnerId': PARTNER_ID}
+    return render(request, 'brain/list.html', content)
