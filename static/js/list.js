@@ -25,9 +25,6 @@ function loadList(){
 }
 
 window.onload = function(){
-    addTag('#tag-warning');
-    $('#first_tag').val();
-
     var ut = $.get(makeURL('uploadToken','add'),function(data){
         $('#uploadTokenId').val(data['id']);
         loadList();

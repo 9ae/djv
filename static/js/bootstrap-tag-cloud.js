@@ -62,7 +62,7 @@ function addTagBindings(id) {
 
 		$(id + ' > button').click(function(){ addTag(id); });
 
-		$(id + ' > input').keyup(function (e) {  if (e.keyCode == 13) { addTag(id); }  });	
+		$(id + ' input[name="tag"]').keyup(function (e) {  if (e.keyCode == 13) { addTag(id); }  });	
 
 }
 
@@ -71,8 +71,8 @@ function addTagBindings(id) {
 // need to be applied when the tag element is added to the dom
 function addTag(id) {
 	
-	var Tag = $(id + ' > input').val();
-	
+	var Tag = $(id + ' input[name="tag"]').val();
+	console.log(Tag);
 	var tagClass = '';
 
 	// Setup our class based on what type of container we have everything inside 
@@ -90,7 +90,7 @@ function addTag(id) {
 		$('<li class="'+tagClass+'">'+Tag+'</li>').appendTo("#tag-cloud");
 
 		// Clear input back to nothing
-		$(id + ' > input').val('');
+		$(id + '  input[name="tag"]').val('');
 	}
     loadList();
 

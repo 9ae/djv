@@ -56,7 +56,6 @@ class StatusDetail(APIView):
 
         return Response(status=status.HTTP_404_NOT_FOUND)
 
-
 class MediaList(APIView):
     """
     List all media, or upload a new media.
