@@ -3,3 +3,5 @@ python manage.py runserver 104.130.3.99:80
 
 rabbitmq-server -detached
 
+
+ps aux | grep python | awk '{print $2}' | xargs kill

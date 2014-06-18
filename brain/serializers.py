@@ -1,15 +1,9 @@
 from rest_framework import serializers
 
-from models import FbPhoto
 from models import FbUser
 from models import Media
 from models import Tag
 
-
-class FbPhotoSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = FbPhoto
-        fields = ('id', 'url',)
 
 class FbUserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:

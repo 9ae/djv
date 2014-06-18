@@ -41,6 +41,7 @@ INSTALLED_APPS = (
     'brain',
     'oauth',
     'rest_framework',
+    'djcelery',
 )
 
 MIDDLEWARE_CLASSES = (

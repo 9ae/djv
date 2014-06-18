@@ -1,7 +1,6 @@
 from collections import Counter
 import logging
 import json
-import math
 import os
 from pprint import pformat
 import tempfile
@@ -42,8 +41,8 @@ def get_facepp_api():
     from facepp import API
     from djv.utils import get_api_secrets
 
-    return API(get_api_secrets()['facepp']['key'],
-               get_api_secrets()['facepp']['secret'])
+    return API(get_api_secrets()['facepp']['deja vu']['key'],
+               get_api_secrets()['facepp']['deja vu']['secret'])
 
 
 def get_fb_photos(access_token, user_id='me', limit=200):
@@ -74,6 +73,8 @@ def process_fb_photo(fb_photo_obj, access_token, user_id='me'):
         width = fb_photo_obj['width']
 
         tags = filter(lambda x: 'id' in x, fb_photo_obj['tags']['data'])
+        logging.debug('Number of tags found: "%s"' % len(tags))
+
         height = fb_photo_obj['height']
         width = fb_photo_obj['width']
 
@@ -94,7 +95,7 @@ def process_fb_photo(fb_photo_obj, access_token, user_id='me'):
         for t in tags:
             source_image = Image.open(source_filename)
             tag_id = t['id']
-            tag_id = '%(user_id)s.%(photo_id)s.%(tag_id)s' % locals()
+            photo_tag_id = '%(user_id)s.%(photo_id)s.%(tag_id)s' % locals()
             x = t['x']
             y = t['y']
 
@@ -106,21 +107,25 @@ def process_fb_photo(fb_photo_obj, access_token, user_id='me'):
                 (y + y_tolerance) * height,
             )
             box = map(lambda x: int(round(x / 100.0)), box)
-            logging.info('[%(tag_id)s] Crop Box: %(box)s, Image Dimension: %(height)s x %(width)s' % locals())
+            logging.info('[%(photo_tag_id)s] Crop Box: %(box)s, Image Dimension: %(height)s x %(width)s' % locals())
 
             # crop image
             cropped_image = source_image.crop(box)
-            cropped_filename = os.path.join(settings.MEDIA_ROOT, '%(tag_id)s.jpg' % locals())
+            cropped_filename = os.path.join(settings.MEDIA_ROOT, 'facebook', user_id, '%(photo_tag_id)s.jpg' % locals())
+
+            # create directory if they do not exist
+            if not os.path.isdir(os.path.dirname(cropped_filename)):
+                os.makedirs(os.path.dirname(cropped_filename))
 
             # save cropped image to media location
             cropped_image.save(cropped_filename)
 
             # save cropped image to database
-            fb_photo_tags.append(dict(id=tag_id,
+            fb_photo_tags.append(dict(id=photo_tag_id,
                                       name=t['name'],
-                                      image=os.path.basename(cropped_filename)),
-                                      width=math.abs(box[0]-box[2]),
-                                      height=math.abs(box[1]-box[3]))
+                                      image=os.path.relpath(cropped_filename, settings.MEDIA_ROOT),
+                                      width=abs(box[0]-box[2]),
+                                      height=abs(box[1]-box[3])))
     except Exception, e:
         logging.error(str(e))
     finally:
@@ -143,10 +148,10 @@ def filter_fb_photos_for_training(fb_photo_tags, min_sample_size=10, limit=25):
         if name in names:
             fb_photo_tags0.setdefault(name, []).append(p)
 
-    # get top photo for name with largest area
+    # get top photo for name with largest image area
     results = []
     for _, ps in fb_photo_tags0.iteritems():
-        results.extend(sorted(ps, cmp=lambda x, y: cmp(x['width'] * x['height'], y['width'] * y['height']), reversed=True)[:limit])
+        results.extend(sorted(ps, cmp=lambda x, y: cmp(x['width'] * x['height'], y['width'] * y['height']), reverse=True)[:limit])
 
     return results
 
