@@ -23,10 +23,10 @@ from ThinkThread import ThinkThread
 from ThinkThread import think
 
 
-EXECUTOR = concurrent.futures.ThreadPoolExecutor(max_workers=4)
-def shutdown():
-    EXECUTOR.shutdown(wait=True)
-atexit.register(shutdown)
+#EXECUTOR = concurrent.futures.ThreadPoolExecutor(max_workers=4)
+#def shutdown():
+#    EXECUTOR.shutdown(wait=True)
+#atexit.register(shutdown)
 
 
 class MediaList(APIView):
@@ -42,6 +42,9 @@ class MediaList(APIView):
     def post(self, request, format=None):
         # TODO: begin process of accessing external APIs and tagging
         # currently only creates a dummy media object
+
+        import pdb; pdb.set_trace()
+
         entry_id = request.DATA.get('id')
         services = request.DATA.get('services', {})
 

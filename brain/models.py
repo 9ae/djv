@@ -5,10 +5,10 @@ from django.db import models
 
 from djv import settings
 
-class FbPhoto(models.Model):
-    id = models.CharField(max_length=100, primary_key=True)
-    name = models.CharField(max_length=200)
-    url = models.URLField()
+#class FbPhoto(models.Model):
+#    id = models.CharField(max_length=100, primary_key=True)
+#    name = models.CharField(max_length=200)
+#    url = models.URLField()
 
 
 class FbUser(models.Model):
@@ -17,11 +17,11 @@ class FbUser(models.Model):
     is_initialised = models.BooleanField(default=False)
 
 
-class FbPhotoTag(models.Model):
-    id = models.CharField(max_length=100, primary_key=True)
-    name = models.CharField(max_length=100)
-    image = models.ImageField(upload_to='facebook')
-    requestor = models.ForeignKey(FbUser)
+#class FbPhotoTag(models.Model):
+#    id = models.CharField(max_length=100, primary_key=True)
+#    name = models.CharField(max_length=100)
+#    image = models.ImageField(upload_to='facebook')
+#    requestor = models.ForeignKey(FbUser)
 
 
 class Tag(models.Model):

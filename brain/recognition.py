@@ -1,6 +1,7 @@
 from collections import Counter
 import logging
 import json
+import math
 import os
 from pprint import pformat
 import tempfile
@@ -117,7 +118,9 @@ def process_fb_photo(fb_photo_obj, access_token, user_id='me'):
             # save cropped image to database
             fb_photo_tags.append(dict(id=tag_id,
                                       name=t['name'],
-                                      image=os.path.basename(cropped_filename)))
+                                      image=os.path.basename(cropped_filename)),
+                                      width=math.abs(box[0]-box[2]),
+                                      height=math.abs(box[1]-box[3]))
     except Exception, e:
         logging.error(str(e))
     finally:
@@ -127,12 +130,25 @@ def process_fb_photo(fb_photo_obj, access_token, user_id='me'):
     return fb_photo_tags
 
 
-def filter_fb_photos_for_training(fb_photo_tags, min_sample_size=10):
+def filter_fb_photos_for_training(fb_photo_tags, min_sample_size=10, limit=25):
+    # get set of names that meet the minimum sample size
     name_counts = Counter([t['name'] for t in fb_photo_tags])
     name_counts = sorted(name_counts.items(), cmp=lambda x, y: cmp(x[1], y[1]), reverse=True)
     names = map(lambda x: x[0], filter(lambda x: x[1] >= min_sample_size, name_counts))
 
-    return filter(lambda x: x['name'] in names, fb_photo_tags)
+    # get all photos in set of names
+    fb_photo_tags0 = {}
+    for p in fb_photo_tags:
+        name = p['name']
+        if name in names:
+            fb_photo_tags0.setdefault(name, []).append(p)
+
+    # get top photo for name with largest area
+    results = []
+    for _, ps in fb_photo_tags0.iteritems():
+        results.extend(sorted(ps, cmp=lambda x, y: cmp(x['width'] * x['height'], y['width'] * y['height']), reversed=True)[:limit])
+
+    return results
 
 
 #    fb_user = FbUser.objects.get(id=user_id)
