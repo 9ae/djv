@@ -4,6 +4,7 @@ import json
 import urllib
 
 from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
 
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -39,6 +40,7 @@ class MediaList(APIView):
         serializer = MediaSerializer(medias, many=True)
         return Response(serializer.data)
 
+    @csrf_exempt
     def post(self, request, format=None):
         # TODO: begin process of accessing external APIs and tagging
         # currently only creates a dummy media object
@@ -116,8 +118,7 @@ def api_root(request, format=None):
 
 def webview(request):
     return render(request, 'brain/webview.html')
-
-
+    
 def list(request):
     secrets = get_api_secrets()['kaltura']
     tag = request.GET.get('tag')
