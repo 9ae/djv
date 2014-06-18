@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <script type="text/javascript" src="/static/js/jq.js"></script>
         <script type="text/javascript" src="static/bootstrap/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="/static/kaltura/minified/kaltura.min.js"></script>
+   <!-- <script type="text/javascript" src="/static/kaltura/minified/kaltura.min.js"></script> -->
     <title>Deja Vu: list</title>
         <link rel="stylesheet" type="css/" href="static/bootstrap/css/bootstrap.min.css" />
     <link rel="stylesheet" type="css/" href="static/css/bootstrap-tag-cloud.css" />
@@ -78,8 +78,10 @@
 </div>
 
 <div class="upload">
-    <form id="upload" method="post">
-    <input type="file" id="file" name="fileData" /><input type="submit" value="upload" id="do_upload" />
+    <form id="upload" enctype="multipart/form-data">
+    <input type="hidden" id="uploadTokenId" name="uploadTokenId" value="{{ uploadToken }}" />
+    <input type="file" id="fileData" name="fileData" />
+    <input type="button" value="upload" id="do_upload" />
     </form>
 </div>
 <script type="text/javascript" src="static/js/bootstrap-tag-cloud.js"></script>

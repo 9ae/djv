@@ -19,7 +19,7 @@ from tasks import initialise_fb_user
 from djv.utils import get_api_secrets
 
 from KalturaImages import GetKS
-from ThinkThread import ThinkThread
+from KalturaUpload import get_upload_token
 from ThinkThread import think
 
 
@@ -123,5 +123,10 @@ def webview(request):
 
 def list(request):
     secrets = get_api_secrets()['kaltura']
-    content = {'ks':GetKS(),'tag': request.GET.get('tag') , 'partnerId': secrets['partner_id']}
+    tag = request.GET.get('tag')
+    if tag==None:
+        tag = ''
+    ks = GetKS()
+    upload_token = get_upload_token(ks)
+    content = {'ks':ks,'tag': tag , 'partnerId': secrets['partner_id'], 'uploadToken':upload_token }
     return render(request, 'brain/list.html', content)
