@@ -7,7 +7,6 @@ import logging
 import requests
 import kaltura
 
-from api_secrets import *
 from models import Media
 from KalturaUpload import update_tags
 from time import sleep
@@ -28,9 +27,11 @@ def post_entry(entry_id, transcription_type='human'):
         return False
     entry_url = kaltura.get_entry_download_url_with_flavor(entry_id)
     if entry_url is None: return False
+
+    secrets = get_api_secrets()['voicebase']
     params = {
-        'apikey': VOICEBASE_APIKEY,
-        'password': VOICEBASE_PASSWD,
+        'apikey': secrets['key'],
+        'password': secrets['password'],
         'action': 'uploadMediaGet',
         'mediaURL': entry_url,
         'transcriptType': transcription_type,
@@ -54,9 +55,10 @@ def get_transcript(entry_id):
 
     Return None if transcript is not available.
     """
+    secrets = get_api_secrets()['voicebase']
     params = {
-        'apikey': VOICEBASE_APIKEY,
-        'password': VOICEBASE_PASSWD,
+        'apikey': secrets['key'],
+        'password': secrets['password'],
         'action': 'getTranscript',
         'externalID': entry_id,
         'confidence': 0.75,
@@ -75,9 +77,10 @@ def get_keywords(entry_id):
     Note that we are using the GetFileAnalytics API, which gives the real
     keywords. The GetKeywords/GetSEOKeywords API simply returns the transcript.
     """
+    secrets = get_api_secrets()['voicebase']
     params = {
-        'apikey': VOICEBASE_APIKEY,
-        'password': VOICEBASE_PASSWD,
+        'apikey': secrets['key'],
+        'password': secrets['password'],
         'action': 'getFileAnalytics',
         'externalID': entry_id,
         'format': 'txt',
@@ -146,9 +149,10 @@ def get_SEO_keywords(entry_id):
 
     Return None if transcript is not available.
     """
+    secrets = get_api_secrets()['voicebase']
     params = {
-        'apikey': VOICEBASE_APIKEY,
-        'password': VOICEBASE_PASSWD,
+        'apikey': secrets['key'],
+        'password': secrets['password'],
         'action': 'getSEOKeywords',
         'externalID': entry_id,
         'format': 'txt',

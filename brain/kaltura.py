@@ -5,9 +5,10 @@ __author__ = 'henry'
 import logging
 import requests
 
-from api_secrets import *
 from KalturaClient import *
 from KalturaClient.Plugins.Metadata import *
+
+from djv.utils import get_api_secrets
 
 logger = logging.getLogger(__name__)
 
@@ -16,13 +17,17 @@ MP3_FLAVOR_ID = 786871  # FlavorParamsID for MP3 file to be send to VoiceBase
 
 def get_ks():
     """Start new Kaltura API session and return key"""
-    config = KalturaConfiguration(PARTNER_ID)
+    secrets = get_api_secrets()['kaltura']
+    config = KalturaConfiguration(secrets['kaltura'])
     config.serviceUrl = SERVICE_URL
     #config.setLogger(logger)
     client = KalturaClient(config)
-    ks = client.generateSession(ADMIN_SECRET, USER_NAME,
-            KalturaSessionType.ADMIN, PARTNER_ID, 86400, "")
-    return ks
+    return client.generateSession(secrets['admin_secrets'],
+                                  secrets['username'],
+                                  KalturaSessionType.ADMIN,
+                                  secrets['partner_id'],
+                                  86400,
+                                  '')
 
 def call_kaltura(params, post=False, **kwargs):
     _params = {

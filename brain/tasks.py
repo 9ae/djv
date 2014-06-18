@@ -4,6 +4,9 @@ import urlparse
 from celery.result import ResultSet
 
 from djv.celery import app
+from brain.KalturaImages import generate_images
+from brain.ReKImages import tag_images_stock
+from brain.ReKImages import tag_people
 from brain.recognition import get_fb_user
 from brain.recognition import get_fb_photos
 from brain.recognition import clean_training_state
@@ -36,6 +39,26 @@ def initialise_fb_user(domain_uri, access_token):
     train_fb_photos(group_name)
 
     clean_training_state(processed_photos)
+
+@app.task(name='brain.tasks.think')
+def think(entry_id, access_token):
+    fb_user = get_fb_user(access_token)
+    group_name = fb_user.id
+
+    # async get keywords from VoiceBase
+
+    # get image samplings from Kaltura video
+    generate_images(entry_id)
+
+    # async process facial recognition
+
+
+    # async process object recognition
+
+
+@app.task(name='brain.tasks.generate_image_samplings_from_kaltura')
+def generate_image_samplings_from_kaltura(entry_id):
+    generate_images(entry_id)
 
 
 @app.task(name='brain.tasks.process_fb_photo')

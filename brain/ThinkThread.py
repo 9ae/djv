@@ -39,3 +39,13 @@ class ThinkThread(Thread):
             human_future  = executor.submit(tag_people, self.entry_id, self.access_token)
             voice_future  = executor.submit(tag_voice, self.entry_id)
 
+def think(entry_id, services, executor=None):
+    generate_images(entry_id)
+
+    if services.get('stockpodium'):
+        object_future = executor.submit(tag_images_stock, entry_id) \
+            if executor is not None else tag_images_stock(entry_id)
+    if services.get('facepp'):
+        access_token = services['facepp']
+        human_future = executor.submit(tag_people, entry_id, access_token) \
+            if executor is not None else tag_people(entry_id, access_token)
