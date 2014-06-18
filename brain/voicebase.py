@@ -127,6 +127,11 @@ def main():
         logging.debug('Processing entry: {}'.format(entry_id))
         if post_entry(entry_id):
             tags = get_keywords(entry_id)
+            transcript = get_transcript(entry_id)
+            print 'Transcript:'
+            print transcript
+            if transcript is not None:
+                tags += transcript.split(' ')
             if tags is not None and len(tags) > 0:
                 update_tags(entry_id, tags)
 
