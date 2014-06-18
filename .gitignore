@@ -10,3 +10,4 @@ libs
 logs
 media
 static/images
+.idea/*
