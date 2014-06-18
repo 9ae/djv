@@ -23,9 +23,8 @@ def process_images(entry_id):
     tag_images_stock(entry_id)
     # face-recogn(entry_id)
 
-
+'''
 class ThinkThread(Thread):
-
     def __init__(self, entry_id, access_token):
         Thread.__init__(self)
         self.entry_id = entry_id
@@ -38,6 +37,7 @@ class ThinkThread(Thread):
             object_future = executor.submit(tag_images_stock, self.entry_id)
             human_future  = executor.submit(tag_people, self.entry_id, self.access_token)
             voice_future  = executor.submit(tag_voice, self.entry_id)
+'''
 
 def think(entry_id, services, executor=None):
     generate_images(entry_id)
@@ -49,3 +49,9 @@ def think(entry_id, services, executor=None):
         access_token = services['facepp']
         human_future = executor.submit(tag_people, entry_id, access_token) \
             if executor is not None else tag_people(entry_id, access_token)
+    # Henry: Make it always run voice recognition, since I don't know what
+    # "service" name is used by ryan.
+    if executor is not None:
+        voice_future  = executor.submit(tag_voice, entry_id)
+    else:
+        tag_voice(entry_id)

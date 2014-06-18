@@ -8,6 +8,9 @@ import view
 import kaltura
 import voicebase
 
+# For calling think from shell
+import ThinkThread
+
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
 

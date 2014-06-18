@@ -7,6 +7,7 @@ import logging
 import requests
 import kaltura
 
+from djv.utils import get_api_secrets
 from models import Media
 from KalturaUpload import update_tags
 from time import sleep
@@ -15,16 +16,22 @@ logger = logging.getLogger(__name__)
 
 API_URL = 'https://www.VoiceBase.com/services?version=1.0'
 
+class VoiceBasePostGiveUp(Exception): pass
+
 def post_entry(entry_id, transcription_type='human'):
     """Post a Kaltura entry to VoiceBase for transcription
 
     Transcription type can be either human or machine.
+
+    Return True of video is posted, False if not (meaning that we should retry
+    a little later). Raises an exception to signal that task is not doable.
     """
     duration = kaltura.get_entry_duration(entry_id)
-    if duration is None: return False
-    if duration <= 5000:
-        logger.debug('Entry {} is too short for voice tagging'.format(entry_id))
-        return False
+    if duration is None:
+        raise VoiceBasePostGiveUp('Cannot find entry {}'.format(entry_id))
+    if duration <= 4000:
+        raise VoiceBasePostGiveUp(
+                'Entry {} is too short for voice tagging'.format(entry_id))
     entry_url = kaltura.get_entry_download_url_with_flavor(entry_id)
     if entry_url is None: return False
 
@@ -99,19 +106,20 @@ def tag_voice(entry_id, timeout=3600):
     """Interface with ThinkThread"""
     end_time = datetime.datetime.now() + datetime.timedelta(seconds=timeout)
 
-    while datetime.datetime.now() < end_time:
-        if post_entry(entry_id): break
-        sleep(10)
+    try:
+        while datetime.datetime.now() < end_time:
+            if post_entry(entry_id): break
+            sleep(10)
 
-    while datetime.datetime.now() < end_time:
-        tags = get_keywords(entry_id)
-        if tags is not None: break
-        sleep(10)
+        while datetime.datetime.now() < end_time:
+            tags = get_keywords(entry_id)
+            if tags is not None: break
+            sleep(10)
 
-    if tags is not None and len(tags) > 0:
-        update_tags(entry_id, tags)
-
-
+        if tags is not None and len(tags) > 0:
+            update_tags(entry_id, tags)
+    except VoiceBasePostGiveUp as e:
+        print e
 
 def main():
     for media in Media.objects.all():
