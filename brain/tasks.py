@@ -4,10 +4,13 @@ import os
 import urlparse
 
 from celery.result import ResultSet
+from django.db import transaction
 
 from brain.kaltura import get_entry_metadata
 from brain.kaltura import get_entry_thumbnail
 from brain.KalturaUpload import update_tags
+from brain.models import Media
+from brain.models import Status
 from brain.ReKImages import tag_objects
 from brain.ReKImages import tag_people
 from brain.recognition import get_fb_user
@@ -47,7 +50,7 @@ def initialise_fb_user(domain_uri, access_token):
     media_uri = urlparse.urljoin(domain_uri, settings.MEDIA_URL)
 
     if settings.USE_ASYNC:
-        results = ResultSet([upload_fb_photos_to_api.delay([p], group_name, media_uri) for p in filtered_photos])
+        results = ResultSet([upload_fb_photos_for_training.delay([p], group_name, media_uri) for p in filtered_photos])
         results.join()
     else:
         upload_fb_photos_for_training(filtered_photos, group_name, media_uri)
@@ -55,6 +58,16 @@ def initialise_fb_user(domain_uri, access_token):
     train_fb_photos(group_name)
 
 #    clean_training_state(processed_photos)
+
+
+@transaction.atomic
+def save_service_status(entry_id, service, state, message=''):
+    status, _ = Status.objects.get_or_create(media=Media.objects.get(id=entry_id),
+                                             service=service)
+    status.state = state
+    status.message = message
+    status.save()
+
 
 @app.task(name='brain.tasks.think')
 def think(entry_id, services, domain_uri):
@@ -66,6 +79,7 @@ def think(entry_id, services, domain_uri):
     # async get keywords from VoiceBase
     # only do this for async mode
     if services.get('voicebase') and settings.USE_ASYNC:
+        save_service_status(entry_id, 'VOICEBASE', 'PROGRESS')
         generate_voice_keyword_tags.delay(entry_id)
 
     # get image samplings from Kaltura video
@@ -73,9 +87,15 @@ def think(entry_id, services, domain_uri):
 
     # process object recognition
     # process facial recognition
-    results = []
     is_generate_object_tags = services.get('stockpodium', False)
     is_generate_friend_tags = services.get('facepp', False)
+
+    if is_generate_object_tags:
+        save_service_status(entry_id, 'STOCKPODIUM', 'PROGRESS')
+    if is_generate_friend_tags:
+        save_service_status(entry_id, 'FACEPP', 'PROGRESS')
+
+    results = []
     for i in images:
         image_url = urlparse.urljoin(domain_uri, settings.MEDIA_URL + i)
         if is_generate_object_tags:
@@ -92,6 +112,9 @@ def think(entry_id, services, domain_uri):
     # wait for tagging to be complete
     if results:
         ResultSet(results).join()
+
+    save_service_status(entry_id, 'STOCKPODIUM', 'SUCCESS')
+    save_service_status(entry_id, 'FACEPP', 'SUCCESS')
 
     # clean generate image samplings
     for i in images:
@@ -133,6 +156,9 @@ def generate_voice_keyword_tags(entry_id):
     tags = get_keywords.delay(entry_id).result
     if not isinstance(tags, Excpetion):
         update_tags(entry_id, tags)
+        save_service_status(entry_id, 'VOICEBASE', 'SUCCESS')
+    else:
+        save_service_status(entry_id, 'VOICEBASE', 'FAIL', str(tags))
 
 
 @app.task(name='brain.tasks.generate_thumbnail_at_time_from_kaltura')

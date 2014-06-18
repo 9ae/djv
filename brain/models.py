@@ -59,8 +59,6 @@ class Media(models.Model):
         tags = kaltura.get_entry_tags(self.id)
         return tags or []
 
-    tags = models.ManyToManyField(Tag)
-
 class Status(models.Model):
     SERVICES = (
         ('FACEPP', 'Face++',),
@@ -77,7 +75,12 @@ class Status(models.Model):
 
     media = models.ForeignKey(Media)
     service = models.CharField(max_length=12, choices=SERVICES)
-    state = models.CharField(max_length=10, choices=STATES, default=STATES)
+    state = models.CharField(max_length=10, choices=STATES, default='NULL')
+    message = models.CharField(max_length=200, null=True)
 
     class Meta:
         unique_together = ('media', 'service',)
+
+    def __unicode__(self):
+        return '[%s] %s -> %s: %s' % (self.media.id, self.service, self.state, self.message,)
+

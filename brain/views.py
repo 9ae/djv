@@ -11,9 +11,12 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 
-from models import FbUser, Media
+from models import FbUser
+from models import Media
+from models import Status
 from serializers import FbUserSerializer
 from serializers import MediaSerializer
+from serializers import StatusSerializer
 from tasks import initialise_fb_user
 
 from djv.utils import get_api_secrets
@@ -27,6 +30,30 @@ from ThinkThread import think
 #def shutdown():
 #    EXECUTOR.shutdown(wait=True)
 #atexit.register(shutdown)
+
+
+class StatusList(APIView):
+    """
+    List all status progress for media tagging.
+    """
+
+    def get(self, request, format=None):
+        statuses = Status.objects.all()
+        serializer = StatusSerializer(statuses, many=True)
+        return Response(serializer.data)
+
+class StatusDetail(APIView):
+    """
+    Get status progress for a particular entry.
+    """
+
+    def get(self, request, entry_id, format=None):
+        query = Status.objects.filter(media_id=entry_id)
+        if query.count():
+            serializer = StatusSerializer(query.all(), many=True)
+            return Response(serializer.data)
+
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 class MediaList(APIView):
@@ -116,6 +143,8 @@ class FbFriendList(APIView):
 def api_root(request, format=None):
     return Response({
         'medias': reverse('media-list', request=request, format=format),
+        'status': reverse('status-list', request=request, format=format),
+        'status_detail': reverse('status-detail', request=request, format=format,),
         'fb_friends': reverse('fb-friends-list', request=request, format=format),
         'fb_profile_detail': reverse('fb-profile-detail', request=request, format=format),
     })
