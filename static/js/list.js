@@ -63,8 +63,15 @@ function uploadFile(event){
                             console.log('upload complete');
                             console.log(data);
                             var entryResults = data;
-                            var thinkBody = {'id': data.id, 'services':{'stockpodium':true,'voicebase':true}};
-                            $.post('/media/', thinkBody);
+                            var thinkBody = {'id': entryResults.id, 'services':{'stockpodium':true,'voicebase':true}};
+                            $.ajax({
+                                url:'/media/',
+                                type: 'POST',
+                                contentType:'application/json',
+                                data: thinkBody
+                            }).done(function(){
+                                console.log('sent for tagging');
+                            });
                         }); // end of addcontent
                     }); // end of add media
                 } //end of if
