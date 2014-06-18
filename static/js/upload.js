@@ -52,3 +52,5 @@ function uploadFile(event){
             }
     });
 }
+
+$('#do_upload').click(uploadFile);

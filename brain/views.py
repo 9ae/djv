@@ -153,14 +153,15 @@ def api_root(request, format=None):
 
 def webview(request):
     return render(request, 'brain/webview.html')
-
+ 
+@csrf_exempt
 def upload(request):
     secrets = get_api_secrets()['kaltura']
     ks = GetKS()
     upload_token = get_upload_token(ks)
     content = {'ks':ks, 'partnerId': secrets['partner_id'], 'uploadToken':upload_token }
-    return render(request, 'brain/upload.html', content),
-    
+    return render(request, 'brain/upload.html', content)
+  
 def list(request):
     secrets = get_api_secrets()['kaltura']
     ks = GetKS()
