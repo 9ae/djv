@@ -11,6 +11,9 @@ function makeURL(service,action){
 function loadList(){
     var partnerId = $('#partner').val();
     var url = makeURL('media','list');
+    var tags = tagsChanged();
+    url+='&filter:tagsLike='+tags.join(',');
+     $('#listContent').html('');
     $.get(url, function(data){
         console.log(data);
         for(var i=0; i<data.totalCount; i++){
@@ -35,6 +38,7 @@ function uploadFile(event){
 }
 
 window.onload = function(){
-    loadList();
+    addTag('#tag-warning');
     $('#upload').attr('action',makeURL('media','upload'));
+    $('#first_tag').val();
 };

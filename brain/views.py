@@ -120,7 +120,8 @@ def api_root(request, format=None):
 def webview(request):
     return render(request, 'brain/webview.html')
 
-def list(request, tag=''):
+
+def list(request):
     secrets = get_api_secrets()['kaltura']
-    content = {'ks':GetKS(),'tag':tag , 'partnerId': secrets['partner_id']}
+    content = {'ks':GetKS(),'tag': request.GET.get('tag') , 'partnerId': secrets['partner_id']}
     return render(request, 'brain/list.html', content)

@@ -28,13 +28,13 @@ function tagsChanged(){
 var tags = $("#tag-cloud li").map(function(index, element){
 	return $(element).text();
 }).get();
-console.log(tags);
+return tags;
 }
 
 // Add listener for tag removals
 $(document).on('click','.tag-cloud', function removeTag(){ 
-	$(this).remove(); 
-	tagsChanged();
+	$(this).remove();
+    loadList();
 });
 
 
@@ -90,8 +90,8 @@ function addTag(id) {
 		$('<li class="'+tagClass+'">'+Tag+'</li>').appendTo("#tag-cloud");
 
 		// Clear input back to nothing
-		$(id + ' > input').val('');		
-		tagsChanged();
+		$(id + ' > input').val('');
+         loadList();
 	}	
 
 }
