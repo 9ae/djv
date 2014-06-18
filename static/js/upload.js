@@ -3,6 +3,11 @@
  */
 
 
+function updateBar(percent){
+	$('#uploadProgress').attr('aria-valuenow', percent);
+	$('#uploadProgress').css('width',percent+'%');
+}
+
 function uploadFile(event){
     var token = $('#uploadTokenId').val();
     if(token==""){
@@ -12,6 +17,7 @@ function uploadFile(event){
 
     var data = new FormData($('#upload')[0]); // <-- 'this' is your form element
     console.log(data);
+    updateBar(20);
     $.ajax({
             url: url,
             data: data,
@@ -32,7 +38,7 @@ function uploadFile(event){
                         var linkBody = {'entryId': addMediaResults.id,
                             'resource:token': token,
                             'resource:objectType': 'KalturaUploadedFileTokenResource'};
-                        $.post(makeURL('media', 'addContent'), linkBody).done(function (data) {
+                        $.post(makeURL('media', 'addContent'), linkBody, function (data) {
                             console.log('upload complete');
                             console.log(data);
                             var entryResults = data;
@@ -45,12 +51,13 @@ function uploadFile(event){
                                 data: thinkBody
                             }).done(function(){
                                 console.log('sent for tagging');
+                                updateBar(100);
                             });
-                        }); // end of addcontent
-                    }); // end of add media
+                        }).done(function(){  updateBar(80); }); // end of addcontent
+                    }).done(function(){  updateBar(60); }); // end of add media
                 } //end of if
             }
-    });
+    }).done(function(){  updateBar(40); }); // end of upload
 }
 
 $('#do_upload').click(uploadFile);
