@@ -66,7 +66,7 @@ function uploadFile(event){
                             var thinkBody = {'id': entryResults.id, 'services':{'stockpodium':true,'voicebase':true}};
                             thinkBody = JSON.stringify(thinkBody);
                             $.ajax({
-                                url:'http://localhost:8000/media/',
+                                url:'/media/',
                                 type: 'POST',
                                 contentType:'application/json',
                                 data: thinkBody
