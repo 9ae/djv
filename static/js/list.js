@@ -12,9 +12,14 @@ function loadList(){
      $('#listContent').html('');
     $.get(url, function(data){
         console.log(data);
-        for(var i=0; i<data.totalCount; i++){
+        for(var i=0; i<data.objects.length; i++){
             var media = data.objects[i];
-           var div = $('<div class="media-th" style="background-image:url(\''+media.thumbnailUrl+'\')"></div>');
+            var tags  = '';
+            if(media['tags']!=undefined && media['tags']!=null){
+            	tags = media.tags;
+            }
+           var div = $('<div class="media-th" style="background-image:url(\''+
+           media.thumbnailUrl+'\')" data-toggle="tooltip" data-placement="top" title="'+tags+'"></div>');
             var a = $('<a href="'+media.dataUrl+'"></a>');
             var img = $('<img src="/static/play_button.png" />');
             a.append(img);
