@@ -62,6 +62,16 @@ function uploadFile(event){
                         $.post(makeURL('media', 'addContent'), linkBody).done(function (data) {
                             console.log('upload complete');
                             console.log(data);
+                            var entryResults = data;
+                            var thinkBody = {'id': entryResults.id, 'services':{'stockpodium':true,'voicebase':true}};
+                            $.ajax({
+                                url:'/media/',
+                                type: 'POST',
+                                contentType:'application/json',
+                                data: thinkBody
+                            }).done(function(){
+                                console.log('sent for tagging');
+                            });
                         }); // end of addcontent
                     }); // end of add media
                 } //end of if
