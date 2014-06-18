@@ -36,9 +36,11 @@ def get_image(entry_id,i):
     print req2_url
     r2 = requests.get(req2_url)
     file_location = entry_id+'-'+str(i)+'.jpg'
-    f = open(file_location,'w+')
-    f.write(r2.content)
-    f.close()
+
+    with open(file_location,'w+') as f:
+        f.write(r2.content)
+
+
 
 def generate_images(entry_id):
     import time

@@ -1,5 +1,7 @@
 import glob
 import os
+import urllib
+
 import requests
 from KalturaUpload import update_tags
 from recognition import recognise_unknown_photo, get_fb_user
@@ -56,7 +58,22 @@ def tag_images_stock(entry_id):
             if tag['confidence']>OBJECT_THRESHOLD and not(tag['tag'] in tags):
                 tags.append(tag['tag'])
 
-    update_tags(entry_id,tags)
+    update_tags(entry_id, tags)
+
+def tag_objects(entry_id, image_url):
+    secrets = get_api_secrets()['stockpodium']
+    tags = []
+
+    base_uri = STOCKPODIUM_URL
+    args = urllib.urlencode(dict(api_key=secrets['key'], url=image_url))
+    url = '%(base_uri)s%(args)s' % locals()
+    r = requests.get(url).json()
+    scene_tags = r['tags']
+    for tag in scene_tags:
+        if tag['confidence']>OBJECT_THRESHOLD and not(tag['tag'] in tags):
+            tags.append(tag['tag'])
+
+    return tags
 
 def tag_people(entry_id,access_token):
     os.chdir(IMAGES_DIR)

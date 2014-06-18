@@ -12,9 +12,12 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 
-from models import FbUser, Media
+from models import FbUser
+from models import Media
+from models import Status
 from serializers import FbUserSerializer
 from serializers import MediaSerializer
+from serializers import StatusSerializer
 from tasks import initialise_fb_user
 
 from djv.utils import get_api_secrets
@@ -24,10 +27,34 @@ from KalturaUpload import get_upload_token
 from ThinkThread import think
 
 
-EXECUTOR = concurrent.futures.ThreadPoolExecutor(max_workers=4)
-def shutdown():
-    EXECUTOR.shutdown(wait=True)
-atexit.register(shutdown)
+#EXECUTOR = concurrent.futures.ThreadPoolExecutor(max_workers=4)
+#def shutdown():
+#    EXECUTOR.shutdown(wait=True)
+#atexit.register(shutdown)
+
+
+class StatusList(APIView):
+    """
+    List all status progress for media tagging.
+    """
+
+    def get(self, request, format=None):
+        statuses = Status.objects.all()
+        serializer = StatusSerializer(statuses, many=True)
+        return Response(serializer.data)
+
+class StatusDetail(APIView):
+    """
+    Get status progress for a particular entry.
+    """
+
+    def get(self, request, entry_id, format=None):
+        query = Status.objects.filter(media_id=entry_id)
+        if query.count():
+            serializer = StatusSerializer(query.all(), many=True)
+            return Response(serializer.data)
+
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 class MediaList(APIView):
@@ -44,6 +71,7 @@ class MediaList(APIView):
     def post(self, request, format=None):
         # TODO: begin process of accessing external APIs and tagging
         # currently only creates a dummy media object
+
         entry_id = request.DATA.get('id')
         services = request.DATA.get('services', {})
 
@@ -55,7 +83,12 @@ class MediaList(APIView):
         serializer = MediaSerializer(media, data={'id': entry_id})
         if serializer.is_valid():
             serializer.save()
-            think(entry_id, services)
+
+            from brain.tasks import think
+            domain_uri = 'http://%s' % request.get_host()
+            think(entry_id, services, domain_uri)
+            #think(entry_id, services)
+
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -112,6 +145,8 @@ class FbFriendList(APIView):
 def api_root(request, format=None):
     return Response({
         'medias': reverse('media-list', request=request, format=format),
+        'status': reverse('status-list', request=request, format=format),
+        'status_detail': reverse('status-detail', request=request, format=format,),
         'fb_friends': reverse('fb-friends-list', request=request, format=format),
         'fb_profile_detail': reverse('fb-profile-detail', request=request, format=format),
     })

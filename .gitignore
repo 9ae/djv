@@ -1,3 +1,4 @@
+.idea
 .ropeproject
 .venv
 .DS_Store
@@ -10,4 +11,3 @@ libs
 logs
 media
 static/images
-.idea/*
