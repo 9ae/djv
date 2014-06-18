@@ -1,32 +1,36 @@
-<!DOCTYPE html>
-<html>
-<head lang="en">
-    <meta charset="UTF-8">
-    <script type="text/javascript" src="/static/js/jq.js"></script>
-    <title>Deja Vu</title>
-    <style type="text/css">
-        body {
-            background-color: #888;
-        }
+{% extends "base.html" %}
+{% block subtitle %}About{% endblock %}
+{% block morestyles %}
+<style type="text/css">
+body {
+font-size:18px;
+}
 
-        .search input[type="text"] {
-            border-top: none;
-            border-left:none;
-            border-right:none;
-            border-bottom:1px solid orangered;
-            background:none;
-        }
-    </style>
-</head>
-<body>
+.nametag {
+	padding:10px;
+}
+</style>
+{% endblock %}
+{% block content %}
+<div class="col-lg-6 col-lg-offset-2 col-md-6 col-md-offset-2 col-sm-8 col-xs-10">
+<p>Deja Vue helps you quickly find any video you've shot. Instead of scrolling through 
+thumbnails searching for a long lost video, simply type in the name of the friend you video taped, 
+words that were said or even colors you remember seeing. The tagging is already done for you by Deja Vue. </p>
 
-<div class="search">
-    <form method="GET" action="{% url 'list' %}">
-   <input type="text" name="tag" /><button>SEARCH</button>
-        </form>
+<p>We do this by using voice and image recognition APIs to tag your videos and photos.
+ Friends' faces are machine recognized, their words captioned, and even simple objects identified
+  to provide search terms. Think of it as a personal search engine for all your videos. </p>
+  
+ <p>
+Created by
+</p>
+
+<div class="nametag col-lg-4 col-md-4 col-sm-12 col-xs-12">Alice Wong <br />Full Stack</div>
+<div class="nametag col-lg-4 col-md-4 col-sm-12 col-xs-12">Henry Chen <br />Data Analyst</div>
+<div class="nametag col-lg-4 col-md-4 col-sm-12 col-xs-12">Ryan Cleeton <br />iOS</div>
+<div class="nametag col-lg-4 col-md-4 col-sm-12 col-xs-12">Hang Xu <br />UX/UI</div>
+<div class="nametag col-lg-4 col-md-4 col-sm-12 col-xs-12">Ho Yin Lai <br />Backend</div>
 </div>
 
 
-<script type="text/javascript" src="/static/js/search.js"></script>
-</body>
-</html>
+{% endblock %}

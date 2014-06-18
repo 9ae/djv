@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block subtitle %}Upload{% endblock %}
+{% block morestyles %}
+<style type="text/css">
+
+.upload {
+	margin-top:25p;
+	text-align:center;
+}
+</style>
+{% endblock %}
+{% block content %}
+<input type="hidden" id="ks" value="{{ ks }}" />
+<input type="hidden" id="partner" value="{{ partnerId }}" />
+
+<div class="upload">
+	
+	
+<p>Select video to upload, and we will tag it for you</p>
+
+    <form id="upload" enctype="multipart/form-data" class="form-inline" >
+    <input type="hidden" id="uploadTokenId" name="uploadTokenId" value="{{ uploadToken }}" />
+	  <div class="form-group">
+    <label class="label" for="fileData">CHOOSE VIDEO</label> <input type="file" id="fileData" name="fileData" />
+    </div>
+      <div class="form-group">
+    <input type="button" value="UPLOAD FILE" id="do_upload" class="btn" />
+    </div>
+    </form>
+</div>
+<script type="text/javascript" src="/static/js/upload.js"></script>
+{% endblock %}

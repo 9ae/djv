@@ -56,7 +56,6 @@ class StatusDetail(APIView):
 
         return Response(status=status.HTTP_404_NOT_FOUND)
 
-
 class MediaList(APIView):
     """
     List all media, or upload a new media.
@@ -153,13 +152,18 @@ def api_root(request, format=None):
 
 def webview(request):
     return render(request, 'brain/webview.html')
-    
-def list(request):
+ 
+@csrf_exempt
+def upload(request):
     secrets = get_api_secrets()['kaltura']
-    tag = request.GET.get('tag')
-    if tag==None:
-        tag = ''
     ks = GetKS()
     upload_token = get_upload_token(ks)
-    content = {'ks':ks,'tag': tag , 'partnerId': secrets['partner_id'], 'uploadToken':upload_token }
+    content = {'ks':ks, 'partnerId': secrets['partner_id'], 'uploadToken':upload_token }
+    return render(request, 'brain/upload.html', content)
+  
+def list(request):
+    secrets = get_api_secrets()['kaltura']
+    ks = GetKS()
+    upload_token = get_upload_token(ks)
+    content = {'ks':ks, 'partnerId': secrets['partner_id'], 'uploadToken':upload_token }
     return render(request, 'brain/list.html', content)

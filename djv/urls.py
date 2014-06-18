@@ -20,8 +20,9 @@ urlpatterns += format_suffix_patterns(patterns('brain.views',
     url(r'^status/(?P<entry_id>[a-zA-Z0-9_.-]+)/$', views.StatusDetail.as_view(), name='status-detail'),
     url(r'^fb_friend/$', views.FbFriendList.as_view(), name='fb-friends-list'),
     url(r'^fb_profile/$', views.FbProfileDetail.as_view(), name='fb-profile-detail'),
-    url(r'^web$', views.webview, name='webview'),
+    url(r'^about$', views.webview, name='webview'),
     url(r'^list$', views.list, name='list'),
+    url(r'^upload$', views.upload, name='upload'),
     url(r'^webnode/media$', brain.view.media.mediapage, name='webnode_mediapage'),
 ))
 

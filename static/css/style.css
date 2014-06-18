@@ -1,0 +1,32 @@
+@font-face {
+	font-family: CODEbold;
+	src: url('CODEBold.otf');
+}
+
+@font-face {
+	font-family: CODElight;
+	src: url('CODELight.otf');
+}
+
+body {
+      background-color: #fff;
+}
+
+.navi {
+	display: inline;
+}
+
+.navi a {
+	font-family: CODEbold;
+	color:#93a2b2;
+}
+
+.navi a {
+	text-decoration:none;
+	text-align: center;
+}
+
+.navi:hover, .navi a:hover {
+	background-color:#f9e5ea;
+	color:#FFFFFF;
+}
