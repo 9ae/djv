@@ -13,16 +13,17 @@ from djv.utils import get_api_secrets
 logger = logging.getLogger(__name__)
 
 API_BASE_URL = 'http://www.kaltura.com/api_v3/index.php'
+SERVICE_URL = "http://www.kaltura.com"
 MP3_FLAVOR_ID = 786871  # FlavorParamsID for MP3 file to be send to VoiceBase
 
 def get_ks():
     """Start new Kaltura API session and return key"""
     secrets = get_api_secrets()['kaltura']
-    config = KalturaConfiguration(secrets['kaltura'])
+    config = KalturaConfiguration(secrets['partner_id'])
     config.serviceUrl = SERVICE_URL
     #config.setLogger(logger)
     client = KalturaClient(config)
-    return client.generateSession(secrets['admin_secrets'],
+    return client.generateSession(secrets['admin_secret'],
                                   secrets['username'],
                                   KalturaSessionType.ADMIN,
                                   secrets['partner_id'],
