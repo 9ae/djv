@@ -110,6 +110,6 @@ def api_root(request, format=None):
 def webview(request):
     return render(request, 'brain/webview.html')
 
-def list(request, tag=''):
-    content = {'ks':GetKS(),'tag':tag , 'partnerId': PARTNER_ID}
+def list(request):
+    content = {'ks':GetKS(),'tag': request.GET.get('tag') , 'partnerId': PARTNER_ID}
     return render(request, 'brain/list.html', content)
