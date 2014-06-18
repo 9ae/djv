@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block subtitle %}Upload{% endblock %}
+{% block morestyles %}
+{% endblock %}
+{% block content %}
+<input type="hidden" id="ks" value="{{ ks }}" />
+<input type="hidden" id="partner" value="{{ partnerId }}" />
+
+<div class="upload">
+    <form id="upload" enctype="multipart/form-data">
+    <input type="hidden" id="uploadTokenId" name="uploadTokenId" value="{{ uploadToken }}" />
+    <input type="file" id="fileData" name="fileData" />
+    <input type="button" value="upload" id="do_upload" />
+    </form>
+</div>
+<script type="text/javascript" src="/static/js/upload.js"></script>
+{% endblock %}

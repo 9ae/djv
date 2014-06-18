@@ -153,13 +153,17 @@ def api_root(request, format=None):
 
 def webview(request):
     return render(request, 'brain/webview.html')
+
+def upload(request):
+    secrets = get_api_secrets()['kaltura']
+    ks = GetKS()
+    upload_token = get_upload_token(ks)
+    content = {'ks':ks, 'partnerId': secrets['partner_id'], 'uploadToken':upload_token }
+    return render(request, 'brain/upload.html', content),
     
 def list(request):
     secrets = get_api_secrets()['kaltura']
-    tag = request.GET.get('tag')
-    if tag==None:
-        tag = ''
     ks = GetKS()
     upload_token = get_upload_token(ks)
-    content = {'ks':ks,'tag': tag , 'partnerId': secrets['partner_id'], 'uploadToken':upload_token }
+    content = {'ks':ks, 'partnerId': secrets['partner_id'], 'uploadToken':upload_token }
     return render(request, 'brain/list.html', content)

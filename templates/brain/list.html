@@ -1,17 +1,8 @@
-<!DOCTYPE html>
-<html>
-<head lang="en">
-    <meta charset="UTF-8">
-    <script type="text/javascript" src="/static/js/jq.js"></script>
-        <script type="text/javascript" src="static/bootstrap/js/bootstrap.min.js"></script>
-   <!-- <script type="text/javascript" src="/static/kaltura/minified/kaltura.min.js"></script> -->
-    <title>Deja Vu: list</title>
-        <link rel="stylesheet" type="css/" href="static/bootstrap/css/bootstrap.min.css" />
-    <link rel="stylesheet" type="css/" href="static/css/bootstrap-tag-cloud.css" />
+{% extends "base.html" %}
+{% block subtitle %}Search{% endblock %}
+{% block morestyles %}
+    <link rel="stylesheet" type="css/text" href="/static/css/bootstrap-tag-cloud.css" />
     <style type="text/css">
-        body {
-            background-color: #888;
-        }
 
          .search input[type="text"] {
             border-top: none;
@@ -57,8 +48,8 @@
 
         }
     </style>
-</head>
-<body>
+{% endblock %}
+{% block content %}
 <div class="search row">
     <div class="col-lg-9 col-md-9 col-sm-5 col-xs-5">
        <ul id="tag-cloud"></ul>
@@ -77,14 +68,6 @@
 
 </div>
 
-<div class="upload">
-    <form id="upload" enctype="multipart/form-data">
-    <input type="hidden" id="uploadTokenId" name="uploadTokenId" value="{{ uploadToken }}" />
-    <input type="file" id="fileData" name="fileData" />
-    <input type="button" value="upload" id="do_upload" />
-    </form>
-</div>
-<script type="text/javascript" src="static/js/bootstrap-tag-cloud.js"></script>
+<script type="text/javascript" src="/static/js/bootstrap-tag-cloud.js"></script>
 <script type="text/javascript" src="/static/js/list.js"></script>
-</body>
-</html>
+{% endblock %}
