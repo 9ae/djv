@@ -14,9 +14,9 @@ function loadList(){
         console.log(data);
         for(var i=0; i<data.totalCount; i++){
             var media = data.objects[i];
-           var div = $('<div class="media-th"></div>');
+           var div = $('<div class="media-th" style="background-image:url(\''+media.thumbnailUrl+'\')"></div>');
             var a = $('<a href="'+media.dataUrl+'"></a>');
-            var img = $('<img src="'+media.thumbnailUrl+'" />');
+            var img = $('<img src="/static/play_button.png" />');
             a.append(img);
             div.append(a);
             $('#listContent').append(div);

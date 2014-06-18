@@ -30,9 +30,19 @@
         a img {border:none;}
 
         div.media-th {
-            display:inline;
+            display:inline-block;
             margin:5px;
-            border:#888888 solid 4px;
+            border:#888888 solid 4px; 
+            border-radius:4px;
+            min-width:100px;
+            min-height:100px;
+            height:100px;
+        }
+        
+        div.media-th img {
+        	max-height:100px;
+        	max-width:100px;
+        	opacity:0.4;
         }
     </style>
 {% endblock %}
