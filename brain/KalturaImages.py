@@ -30,6 +30,7 @@ def GetKS():
                                   secrets['partner_id'],
                                   86400, "")
 
+
 def get_image(entry_id,i):
     req2_url = '{0}/thumbnail/entry_id/{1}/quality/100/vid_sec/{2}/width/800'.format(PUBLIC_BASE_URL,entry_id,i)
     print req2_url

@@ -51,7 +51,8 @@ function uploadFile(event){
                 var uploadResults = data;
                 console.log(uploadResults);
                 if (uploadResults['fileName'] != undefined) {
-                    $.post(makeURL('media', 'add'), {'entry:mediaType': 2}, function (data) {
+                    var fileName = uploadResults['fileName'];
+                    $.post(makeURL('media', 'add'), {'entry:mediaType': 1, 'entry:name':fileName }, function (data) {
                         console.log('create media');
                         var addMediaResults = data;
                         console.log(addMediaResults);
