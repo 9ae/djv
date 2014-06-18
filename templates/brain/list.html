@@ -78,7 +78,7 @@
 </div>
 
 <div class="upload">
-    <form id="upload">
+    <form id="upload" enctype="multipart/form-data">
     <input type="hidden" id="uploadTokenId" name="uploadTokenId" value="{{ uploadToken }}" />
     <input type="file" id="fileData" name="fileData" />
     <input type="button" value="upload" id="do_upload" />

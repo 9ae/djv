@@ -31,28 +31,40 @@ function loadList(){
 }
 
 function uploadFile(event){
-    var file = $('#fileData').val();
     var token = $('#uploadTokenId').val();
     if(token==""){
         return;
     }
     var url = makeURL('uploadToken','upload');
-    var obj = {'fileData': file, 'uploadTokenId': token};
-    $.post(url,obj, function(data){
-        console.log('upload to token');
-        var uploadResults = data;
-        if(uploadResults['fileName']!=undefined){
-            $.post(makeURL('media','add'), {'entry:mediaType':2},function(data){
-                console.log('create media');
-                var addMediaResults = data;
-                var linkBody = {'entryId':addMediaResults.id,
-                    'resource:token': token,
-                    'resource:objectType':'KalturaUploadedFileTokenResource'};
-                $.post(makeURL('media','addContent'),linkBody).done(function(){
-                    console.log('upload complete');
-                });
-            });
-        }
+
+    var data = new FormData($('#upload')[0]); // <-- 'this' is your form element
+    console.log(data);
+    $.ajax({
+            url: url,
+            data: data,
+            cache: false,
+            contentType: false,
+            processData: false,
+            type: 'POST',
+            success: function(data) {
+                console.log('upload to token');
+                var uploadResults = data;
+                console.log(uploadResults);
+                if (uploadResults['fileName'] != undefined) {
+                    $.post(makeURL('media', 'add'), {'entry:mediaType': 2}, function (data) {
+                        console.log('create media');
+                        var addMediaResults = data;
+                        console.log(addMediaResults);
+                        var linkBody = {'entryId': addMediaResults.id,
+                            'resource:token': token,
+                            'resource:objectType': 'KalturaUploadedFileTokenResource'};
+                        $.post(makeURL('media', 'addContent'), linkBody).done(function (data) {
+                            console.log('upload complete');
+                            console.log(data);
+                        }); // end of addcontent
+                    }); // end of add media
+                } //end of if
+            }
     });
 }
 
