@@ -2,6 +2,6 @@ python manage.py celery worker -c 4
 python manage.py runserver 104.130.3.99:80
 
 rabbitmq-server -detached
-
+rabbitmqctl start
 
 ps aux | grep python | awk '{print $2}' | xargs kill

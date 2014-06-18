@@ -23,6 +23,8 @@ SECRET_KEY = get_api_secrets()['djv']['secret_key']
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+USE_ASYNC = True
+
 TEMPLATE_DEBUG = True
 
 ALLOWED_HOSTS = []

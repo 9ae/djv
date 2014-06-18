@@ -111,6 +111,8 @@ def tag_voice(entry_id, timeout=3600):
     if tags is not None and len(tags) > 0:
         update_tags(entry_id, tags)
 
+
+
 def main():
     for media in Media.objects.all():
         entry_id = media.id

@@ -222,14 +222,21 @@ def train_fb_photos(group_name):
 
 
 def recognise_unknown_photo(group_name, url):
+    from facepp import APIError
+
     api = get_facepp_api()
-    result = api.recognition.recognize(url=url, group_name=group_name)
-    log_result('Recognize Result:', result)
     person = None
-    if len(result['face']) != 0:
-        person = result['face'][0]['candidate'][0]['person_name']
-    print '=' * 60
-    print 'The person with highest confidence:', person
+    try:
+        result = api.recognition.recognize(url=url, group_name=group_name)
+        log_result('Recognize Result:', result)
+        if len(result['face']) != 0:
+            if len(result['face'][0]['candidate']) != 0:
+                person = result['face'][0]['candidate'][0]['person_name']
+        print '=' * 60
+        print 'The person with highest confidence:', person
+    except APIError, e:
+        logging.error(str(e))
+
     return person
 
 

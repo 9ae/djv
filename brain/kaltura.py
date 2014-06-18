@@ -13,7 +13,8 @@ from djv.utils import get_api_secrets
 logger = logging.getLogger(__name__)
 
 API_BASE_URL = 'http://www.kaltura.com/api_v3/index.php'
-SERVICE_URL = "http://www.kaltura.com"
+PUBLIC_BASE_URL = 'http://www.kaltura.com/p/%(partner_id)s' % get_api_secrets()['kaltura']
+SERVICE_URL = 'http://www.kaltura.com'
 MP3_FLAVOR_ID = 786871  # FlavorParamsID for MP3 file to be send to VoiceBase
 
 def get_ks():
@@ -74,6 +75,11 @@ def get_entry_tags(entry_id):
         return tags
     except:
         return None
+
+def get_entry_thumbnail(entry_id, seconds=0):
+    base_uri = PUBLIC_BASE_URL
+    r = requests.get('{base_uri}/thumbnail/entry_id/{entry_id}/quality/100/vid_sec/{seconds}/width/800'.format(**locals()))
+    return r.content
 
 def get_entry_asset_id(entry_id, flavor_id=MP3_FLAVOR_ID):
     """Return asset id for the MP3 version of a Kaltura video

@@ -40,6 +40,8 @@ def get_image(entry_id,i):
     with open(file_location,'w+') as f:
         f.write(r2.content)
 
+
+
 def generate_images(entry_id):
     import time
     ks = GetKS()

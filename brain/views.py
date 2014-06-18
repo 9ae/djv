@@ -43,8 +43,6 @@ class MediaList(APIView):
         # TODO: begin process of accessing external APIs and tagging
         # currently only creates a dummy media object
 
-        import pdb; pdb.set_trace()
-
         entry_id = request.DATA.get('id')
         services = request.DATA.get('services', {})
 
@@ -56,7 +54,12 @@ class MediaList(APIView):
         serializer = MediaSerializer(media, data={'id': entry_id})
         if serializer.is_valid():
             serializer.save()
-            think(entry_id, services)
+
+            from brain.tasks import think
+            domain_uri = 'http://%s' % request.get_host()
+            think(entry_id, services, domain_uri)
+            #think(entry_id, services)
+
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
