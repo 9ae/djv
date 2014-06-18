@@ -24,3 +24,9 @@ def update_tags(entry_id, tags):
         print 'result = '+j['tags']
     else:
         print 'no new tags to update'
+
+def get_upload_token(ks):
+    url = API_BASE_URL+'service=uploadToken&action=add&format=1&ks='+ks;
+    resp = requests.get(url);
+    data = resp.json()
+    return data['id']
